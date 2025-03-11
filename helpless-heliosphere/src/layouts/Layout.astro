@@ -1,6 +1,7 @@
 ---
 import '../styles/global.css';
 import NavigationBar from '../components/NavigationBar.astro';
+import SandCanvas from '../components/SandCanvas.astro';
 
 interface Props {
   title?: string;
@@ -25,6 +26,7 @@ const { title = 'Modern Portfolio', activeLink = '/' } = Astro.props;
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   </head>
   <body>
+    <SandCanvas />
     <!-- Navigation Bar -->
     <NavigationBar activeLink={activeLink} />
 
