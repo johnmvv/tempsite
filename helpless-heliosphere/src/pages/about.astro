@@ -1,0 +1,564 @@
+---
+import Layout from '../layouts/Layout.astro';
+
+// Define active link for navigation
+const activeLink = '/about';
+
+// Skills data for the interactive skill bars
+const skills = [
+  { name: 'HTML/CSS', level: 95 },
+  { name: 'JavaScript', level: 90 },
+  { name: 'TypeScript', level: 85 },
+  { name: 'React', level: 88 },
+  { name: 'Node.js', level: 80 },
+  { name: 'UI/UX Design', level: 75 },
+  { name: 'Astro', level: 85 },
+  { name: 'GraphQL', level: 70 },
+];
+
+// Experience timeline data
+const experiences = [
+  {
+    title: 'Senior Frontend Developer',
+    company: 'Tech Solutions Inc.',
+    period: '2021 - Present',
+    description: 'Lead the frontend development team in creating innovative web applications with React, TypeScript, and GraphQL. Improved site performance by 40% and implemented CI/CD pipelines.'
+  },
+  {
+    title: 'Web Developer',
+    company: 'Digital Creatives',
+    period: '2018 - 2021',
+    description: 'Developed responsive websites and e-commerce platforms for various clients. Worked with React, Vue.js, and WordPress to create custom solutions.'
+  },
+  {
+    title: 'Junior Developer',
+    company: 'StartUp Innovations',
+    period: '2016 - 2018',
+    description: 'Built and maintained web applications using JavaScript and PHP. Collaborated with UX designers to implement intuitive user interfaces.'
+  }
+];
+
+// Education timeline data
+const education = [
+  {
+    degree: 'Master of Computer Science',
+    institution: 'Tech University',
+    period: '2014 - 2016',
+    description: 'Specialized in Web Technologies and Human-Computer Interaction.'
+  },
+  {
+    degree: 'Bachelor of Science in Computer Science',
+    institution: 'State University',
+    period: '2010 - 2014',
+    description: 'Graduated with honors. Active member of the Web Development Club.'
+  }
+];
+---
+
+<Layout title="About Me | Modern Portfolio" activeLink={activeLink}>
+  <!-- About Hero Section -->
+  <section class="about-hero">
+    <div class="container">
+      <div class="about-content">
+        <div class="about-image">
+          <div class="image-frame">
+            <div class="image-placeholder">
+              <i class="fas fa-user"></i>
+            </div>
+          </div>
+          <div class="shape-bg"></div>
+        </div>
+        <div class="about-text animate-slide-up">
+          <h1>About <span class="text-gradient">Me</span></h1>
+          <p class="lead">Passionate developer crafting beautiful digital experiences with modern technologies.</p>
+          <p>With over 5 years of experience in web development, I specialize in creating responsive, user-friendly websites and applications that deliver exceptional user experiences. My expertise spans from frontend technologies like React and Vue.js to backend development with Node.js.</p>
+          <p>I'm dedicated to writing clean, maintainable code and staying up-to-date with the latest industry trends and technologies.</p>
+          <div class="about-actions">
+            <a href="/contact" class="btn">Get In Touch</a>
+            <a href="#" class="btn btn-outline">Download Resume</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Skills Section -->
+  <section class="skills-section" id="skills">
+    <div class="container">
+      <h2 class="section-heading">My <span class="text-gradient">Skills</span></h2>
+      
+      <div class="skills-container">
+        {skills.map((skill) => (
+          <div class="skill-bar">
+            <div class="skill-info">
+              <span class="skill-name">{skill.name}</span>
+              <span class="skill-percentage">{skill.level}%</span>
+            </div>
+            <div class="skill-progress">
+              <div class="skill-progress-bar" style={`width: ${skill.level}%`}></div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- Experience Section -->
+  <section class="experience-section" id="experience">
+    <div class="container">
+      <h2 class="section-heading">Work <span class="text-gradient">Experience</span></h2>
+      
+      <div class="timeline">
+        {experiences.map((exp, index) => (
+          <div class={`timeline-item ${index % 2 === 0 ? 'left' : 'right'}`}>
+            <div class="timeline-content">
+              <div class="timeline-date">{exp.period}</div>
+              <h3>{exp.title}</h3>
+              <h4>{exp.company}</h4>
+              <p>{exp.description}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- Education Section -->
+  <section class="education-section" id="education">
+    <div class="container">
+      <h2 class="section-heading">My <span class="text-gradient">Education</span></h2>
+      
+      <div class="education-container">
+        {education.map((edu) => (
+          <div class="education-card">
+            <div class="education-card-header">
+              <h3>{edu.degree}</h3>
+              <div class="education-period">{edu.period}</div>
+            </div>
+            <h4>{edu.institution}</h4>
+            <p>{edu.description}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- Hobbies & Interests Section -->
+  <section class="interests-section" id="interests">
+    <div class="container">
+      <h2 class="section-heading">Hobbies & <span class="text-gradient">Interests</span></h2>
+      
+      <div class="interests-grid grid grid-3">
+        <div class="interest-card">
+          <div class="interest-icon">
+            <i class="fas fa-book"></i>
+          </div>
+          <h3>Reading</h3>
+          <p>I enjoy reading technical books, science fiction, and philosophy in my spare time.</p>
+        </div>
+        
+        <div class="interest-card">
+          <div class="interest-icon">
+            <i class="fas fa-mountain"></i>
+          </div>
+          <h3>Hiking</h3>
+          <p>Exploring nature trails and mountains helps me stay refreshed and inspired.</p>
+        </div>
+        
+        <div class="interest-card">
+          <div class="interest-icon">
+            <i class="fas fa-camera"></i>
+          </div>
+          <h3>Photography</h3>
+          <p>Capturing moments and exploring photography as a creative outlet.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+</Layout>
+
+<style>
+  /* About Hero Section */
+  .about-hero {
+    padding: 120px 0 80px;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .about-content {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 4rem;
+    align-items: center;
+  }
+  
+  .about-image {
+    position: relative;
+    height: 400px;
+  }
+  
+  .image-frame {
+    width: 300px;
+    height: 300px;
+    border-radius: 20px;
+    overflow: hidden;
+    position: relative;
+    z-index: 2;
+    box-shadow: 0 20px 40px var(--shadow-color);
+  }
+  
+  .image-placeholder {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 5rem;
+    color: rgba(255, 255, 255, 0.8);
+  }
+  
+  .shape-bg {
+    position: absolute;
+    width: 250px;
+    height: 250px;
+    border-radius: 50%;
+    background-color: rgba(84, 101, 255, 0.1);
+    bottom: 0;
+    right: 0;
+    z-index: 1;
+  }
+  
+  .about-text h1 {
+    margin-bottom: 1.5rem;
+    font-size: 3.5rem;
+    line-height: 1.1;
+  }
+  
+  .about-text .lead {
+    font-size: 1.3rem;
+    font-weight: 500;
+    margin-bottom: 1.5rem;
+    color: var(--text-secondary);
+  }
+  
+  .about-text p {
+    margin-bottom: 1.5rem;
+    color: var(--text-secondary);
+    font-size: 1.05rem;
+  }
+  
+  .about-actions {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-top: 2rem;
+  }
+  
+  /* Skills Section */
+  .skills-section {
+    padding: 100px 0;
+    background-color: var(--bg-secondary);
+  }
+  
+  .skills-container {
+    margin-top: 3rem;
+  }
+  
+  .skill-bar {
+    margin-bottom: 1.5rem;
+  }
+  
+  .skill-info {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+  }
+  
+  .skill-name {
+    font-weight: 600;
+  }
+  
+  .skill-percentage {
+    color: var(--accent-primary);
+  }
+  
+  .skill-progress {
+    height: 10px;
+    background-color: var(--border-color);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  
+  .skill-progress-bar {
+    height: 100%;
+    background: linear-gradient(to right, var(--accent-primary), var(--accent-secondary));
+    border-radius: 10px;
+    width: 0;
+    transition: width 1.5s ease;
+  }
+  
+  /* Experience Section */
+  .experience-section {
+    padding: 100px 0;
+  }
+  
+  .timeline {
+    position: relative;
+    max-width: 1200px;
+    margin: 3rem auto;
+  }
+  
+
+  
+  /* Timeline Animation Enhancements */
+  .timeline-item {
+    opacity: 0;
+    transform: translateX(-50px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+  }
+  
+  .timeline-item.right {
+    transform: translateX(50px);
+  }
+  
+  .timeline-item.animate {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  
+  .timeline-content::after {
+    transition: transform 0.3s ease, background-color 0.3s ease;
+  }
+  
+  .timeline-item:hover .timeline-content::after {
+    transform: scale(1.2);
+    background-color: var(--accent-secondary);
+  }
+  
+  .timeline-date {
+    transform: translateY(20px);
+    opacity: 0;
+    transition: all 0.4s ease 0.2s;
+  }
+  
+  .timeline-item.animate .timeline-date {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  
+  .timeline-content h3,
+  .timeline-content h4,
+  .timeline-content p {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.4s ease;
+  }
+  
+  .timeline-item.animate .timeline-content h3 { transition-delay: 0.3s; }
+  .timeline-item.animate .timeline-content h4 { transition-delay: 0.4s; }
+  .timeline-item.animate .timeline-content p { transition-delay: 0.5s; }
+  
+  .timeline-item.animate .timeline-content h3,
+  .timeline-item.animate .timeline-content h4,
+  .timeline-item.animate .timeline-content p {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  
+  /* Education Card Animation Enhancements */
+  .education-card {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: all 0.5s ease;
+  }
+  
+  .education-card.animate {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  
+  /* Education Section */
+  .education-section {
+    padding: 100px 0;
+    background-color: var(--bg-secondary);
+  }
+  
+  .education-container {
+    margin-top: 3rem;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+  }
+  
+  .education-card {
+    background-color: var(--card-bg);
+    border-radius: var(--border-radius);
+    padding: 2rem;
+    box-shadow: 0 10px 30px var(--shadow-color);
+    transition: transform 0.3s ease;
+  }
+  
+  .education-card:hover {
+    transform: translateY(-10px);
+  }
+  
+  .education-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+  }
+  
+  .education-card h3 {
+    font-size: 1.3rem;
+    margin-right: 1rem;
+  }
+  
+  .education-period {
+    font-weight: 600;
+    color: var(--accent-primary);
+    white-space: nowrap;
+  }
+  
+  .education-card h4 {
+    margin-bottom: 1rem;
+    color: var(--text-secondary);
+  }
+  
+  /* Interests Section */
+  .interests-section {
+    padding: 100px 0;
+  }
+  
+  .interest-card {
+    background-color: var(--card-bg);
+    border-radius: var(--border-radius);
+    padding: 2rem;
+    text-align: center;
+    transition: transform 0.3s ease;
+    box-shadow: 0 10px 30px var(--shadow-color);
+  }
+  
+  .interest-card:hover {
+    transform: translateY(-10px);
+  }
+  
+  .interest-icon {
+    font-size: 2.5rem;
+    margin-bottom: 1.5rem;
+    color: var(--accent-primary);
+    width: 80px;
+    height: 80px;
+    background-color: rgba(84, 101, 255, 0.1);
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0 auto 1.5rem;
+  }
+  
+  .interest-card h3 {
+    margin-bottom: 1rem;
+  }
+  
+  .interest-card p {
+    color: var(--text-secondary);
+  }
+  
+  /* Animation for skill bars */
+  .skill-progress-bar {
+    animation: skillProgress 1.5s ease-out forwards;
+    animation-play-state: paused;
+  }
+  
+  @keyframes skillProgress {
+    0% { width: 0; }
+    100% { width: var(--width); }
+  }
+  
+  /* Responsive Adjustments */
+  @media (max-width: 992px) {
+    .about-content {
+      grid-template-columns: 1fr;
+      text-align: center;
+    }
+    
+    .about-image {
+      margin: 0 auto 2rem;
+      justify-content: center;
+      display: flex;
+    }
+    
+    .about-actions {
+      justify-content: center;
+    }
+    
+    .timeline::after {
+      left: 31px;
+    }
+    
+    .timeline-item {
+      width: 100%;
+      padding-left: 70px;
+      padding-right: 0;
+    }
+    
+    .timeline-item.right {
+      left: 0;
+    }
+    
+    .timeline-item.left .timeline-content::after,
+    .timeline-item.right .timeline-content::after {
+      left: -52px;
+    }
+  }
+</style>
+
+<script>
+  // Animate skill bars on scroll
+  document.addEventListener('DOMContentLoaded', () => {
+    const skillBars = document.querySelectorAll('.skill-progress-bar');
+    const timelineItems = document.querySelectorAll('.timeline-item');
+    const educationCards = document.querySelectorAll('.education-card');
+    
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          // Add animation class to timeline items and education cards
+          if (entry.target.classList.contains('timeline-item') ||
+              entry.target.classList.contains('education-card')) {
+            entry.target.classList.add('animate');
+          }
+          
+          // Existing skill bar animation
+          if (entry.target.classList.contains('skill-progress-bar')) {
+            const skillBar = entry.target;
+            const width = skillBar.style.width;
+            skillBar.style.setProperty('--width', width);
+            skillBar.style.width = '0';
+            
+            setTimeout(() => {
+              skillBar.style.animationPlayState = 'running';
+            }, 100);
+          }
+          
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { 
+      threshold: 0.2,
+      rootMargin: '0px 0px -10% 0px'
+    });
+    
+    // Observe all animated elements
+    skillBars.forEach(bar => observer.observe(bar));
+    timelineItems.forEach(item => observer.observe(item));
+    educationCards.forEach(card => observer.observe(card));
+    
+    // Add stagger delay to education cards
+    educationCards.forEach((card, index) => {
+      card.style.transitionDelay = `${index * 0.15}s`;
+    });
+  });
+</script>

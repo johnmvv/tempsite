@@ -1,0 +1,379 @@
+---
+// Props for the navigation component
+interface Props {
+  activeLink?: string;
+}
+
+const { activeLink = '/' } = Astro.props;
+
+// Navigation links
+const navLinks = [
+  { href: '/', label: 'Home' },
+  { href: '/about', label: 'About' },
+  { href: '/projects', label: 'Projects' },
+  { href: '/contact', label: 'Contact' }
+];
+---
+
+<header id="navbar" class="navbar">
+  <div class="container navbar-container">
+    <div class="logo">
+      <a href="/">
+        <span class="logo-text">Portfolio</span>
+        <span class="logo-dot"></span>
+      </a>
+    </div>
+    
+    <nav class="nav-links">
+      <ul>
+        {navLinks.map(link => (
+          <li>
+            <a 
+              href={link.href} 
+              class={activeLink === link.href ? 'active' : ''}
+            >
+              {link.label}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+    
+    <div class="navbar-right">
+      <div class="dark-mode-container">
+        <span class="dark-mode-icon">🌓</span>
+        <div class="dark-mode-slider-container">
+          <input 
+            type="range" 
+            id="darkModeSlider" 
+            min="0" 
+            max="1" 
+            step="0.01" 
+            value="0"
+            aria-label="Adjust dark mode level"
+          />
+          <div class="slider-track"></div>
+        </div>
+      </div>
+      
+      <button class="mobile-nav-toggle" aria-label="Toggle menu">
+        <span class="bar"></span>
+        <span class="bar"></span>
+        <span class="bar"></span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<script>
+  // Wait for DOM to be fully loaded
+  document.addEventListener('DOMContentLoaded', () => {
+    // Elements
+    const navbar = document.getElementById('navbar');
+    const mobileNavToggle = document.querySelector('.mobile-nav-toggle');
+    const navLinks = document.querySelector('.nav-links');
+    const darkModeSlider = document.getElementById('darkModeSlider') as HTMLInputElement;
+    
+    // Scroll handling for floating navbar
+    let lastScrollY = window.scrollY;
+    
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 100) {
+        navbar?.classList.add('floating');
+        
+        // Hide on scroll down, show on scroll up
+        if (window.scrollY > lastScrollY) {
+          navbar?.classList.add('hidden');
+        } else {
+          navbar?.classList.remove('hidden');
+        }
+      } else {
+        navbar?.classList.remove('floating');
+        navbar?.classList.remove('hidden');
+      }
+      
+      lastScrollY = window.scrollY;
+    });
+    
+    // Mobile menu toggle
+    mobileNavToggle?.addEventListener('click', () => {
+      navLinks?.classList.toggle('show');
+      mobileNavToggle.classList.toggle('open');
+    });
+    
+    // Dark mode slider
+    darkModeSlider?.addEventListener('input', (e) => {
+      const target = e.target as HTMLInputElement;
+      const darkLevel = parseFloat(target.value);
+      document.body.style.setProperty('--dark-level', target.value);
+      
+      // Save preference to localStorage
+      localStorage.setItem('darkLevel', target.value);
+    });
+    
+    // Load dark mode preference from localStorage if available
+    const savedDarkLevel = localStorage.getItem('darkLevel');
+    if (savedDarkLevel) {
+      document.body.style.setProperty('--dark-level', savedDarkLevel);
+      if (darkModeSlider) darkModeSlider.value = savedDarkLevel;
+    }
+  });
+</script>
+
+<style>
+  /* Navbar Styles */
+  .navbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: var(--navbar-height);
+    z-index: 1000;
+    background-color: transparent;
+    transition: all 0.3s ease;
+  }
+
+  .navbar.floating {
+    background-color: var(--bg-primary);
+    box-shadow: 0 5px 20px var(--shadow-color);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    background-color: rgba(0, 0, 0, 0.8); /* Changed to be consistently dark */
+  }
+
+  .navbar.hidden {
+    transform: translateY(calc(-1 * var(--navbar-height)));
+  }
+
+  .navbar-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 100%;
+  }
+
+  /* Logo */
+  .logo a {
+    display: flex;
+    align-items: center;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    text-decoration: none;
+  }
+
+  .logo-text {
+    background: linear-gradient(to right, var(--accent-primary), var(--accent-secondary));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .logo-dot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: var(--accent-primary);
+    margin-left: 4px;
+  }
+
+  /* Navigation Links */
+  .nav-links ul {
+    display: flex;
+    list-style: none;
+    gap: 2rem;
+  }
+
+  .nav-links a {
+    color: var(--text-primary);
+    text-decoration: none;
+    font-weight: 500;
+    position: relative;
+    padding: 0.5rem 0;
+  }
+
+  .nav-links a::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 0;
+    height: 2px;
+    background: linear-gradient(to right, var(--accent-primary), var(--accent-secondary));
+    transition: width 0.3s ease;
+  }
+
+  .nav-links a:hover::after,
+  .nav-links a.active::after {
+    width: 100%;
+  }
+
+  /* Right section with dark mode slider */
+  .navbar-right {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+  }
+
+  /* Dark Mode Controls */
+  .dark-mode-container {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .dark-mode-icon {
+    font-size: 1.2rem;
+  }
+
+  .dark-mode-slider-container {
+    position: relative;
+    width: 80px;
+    height: 24px;
+  }
+
+  .slider-track {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    left: 0;
+    right: 0;
+    height: 8px;
+    background: linear-gradient(to right, #f8f9fa, #212529);
+    border-radius: 4px;
+    z-index: 1;
+  }
+
+  #darkModeSlider {
+    position: relative;
+    -webkit-appearance: none;
+    width: 100%;
+    height: 24px;
+    background: transparent;
+    cursor: pointer;
+    z-index: 2;
+  }
+
+  #darkModeSlider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 24px;
+    height: 24px;
+    background: var(--accent-primary);
+    border-radius: 50%;
+    cursor: pointer;
+    border: 3px solid white;
+    box-shadow: 0 0 3px rgba(0, 0, 0, 0.2);
+  }
+
+  #darkModeSlider::-moz-range-thumb {
+    width: 24px;
+    height: 24px;
+    background: var(--accent-primary);
+    border-radius: 50%;
+    cursor: pointer;
+    border: 3px solid white;
+    box-shadow: 0 0 3px rgba(0, 0, 0, 0.2);
+  }
+
+  /* Mobile Navigation Toggle */
+  .mobile-nav-toggle {
+    display: none;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0.5rem;
+    z-index: 10;
+  }
+
+  .mobile-nav-toggle .bar {
+    display: block;
+    width: 25px;
+    height: 3px;
+    margin: 5px 0;
+    background-color: var(--text-primary);
+    transition: all 0.3s ease;
+  }
+
+  .mobile-nav-toggle.open .bar:nth-child(1) {
+    transform: translateY(8px) rotate(45deg);
+  }
+
+  .mobile-nav-toggle.open .bar:nth-child(2) {
+    opacity: 0;
+  }
+
+  .mobile-nav-toggle.open .bar:nth-child(3) {
+    transform: translateY(-8px) rotate(-45deg);
+  }
+
+  /* Responsive Adjustments */
+  @media (max-width: 768px) {
+    .nav-links {
+      position: fixed;
+      top: 0;
+      right: -100%;
+      width: 80%;
+      max-width: 400px;
+      height: 100vh;
+      background-color: var(--bg-primary);
+      box-shadow: -5px 0 20px var(--shadow-color);
+      transition: right 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9;
+    }
+
+    .nav-links.show {
+      right: 0;
+    }
+
+    .nav-links ul {
+      flex-direction: column;
+      gap: 2rem;
+      text-align: center;
+    }
+
+    .mobile-nav-toggle {
+      display: block;
+    }
+
+    .dark-mode-slider-container {
+      width: 60px;
+    }
+  }
+
+  .navbar.floating .nav-links a,
+  .navbar.floating .logo a,
+  .navbar.floating .dark-mode-icon {
+    color: white;
+  }
+  
+  .navbar.floating .mobile-nav-toggle .bar {
+    background-color: white;
+  }
+
+  .navbar.floating .logo-text {
+    background: white;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .navbar.floating .logo-dot {
+    background-color: white;
+  }
+
+  .navbar.floating .slider-track {
+    background: linear-gradient(to right, rgba(255,255,255,0.3), rgba(255,255,255,0.8));
+  }
+
+  .navbar.floating #darkModeSlider::-webkit-slider-thumb {
+    border-color: rgba(0, 0, 0, 0.8);
+  }
+
+  .navbar.floating #darkModeSlider::-moz-range-thumb {
+    border-color: rgba(0, 0, 0, 0.8);
+  }
+</style>

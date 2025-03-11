@@ -1,0 +1,66 @@
+---
+// Testimonials data
+const testimonials = [
+  {
+    name: 'John Doe',
+    title: 'CEO of Company',
+    quote: 'This is an amazing product! It has greatly improved our workflow and efficiency.',
+    image: 'path/to/image1.jpg'
+  },
+  {
+    name: 'Jane Smith',
+    title: 'CTO of Another Company',
+    quote: 'I highly recommend this service. The team is professional and the results are outstanding.',
+    image: 'path/to/image2.jpg'
+  },
+  // Add more testimonials as needed
+];
+---
+
+<div class="testimonials-carousel">
+  {testimonials.map((testimonial, index) => (
+    <div class="testimonial" key={index}>
+      <img src={testimonial.image} alt={testimonial.name} class="testimonial-image" />
+      <blockquote>{testimonial.quote}</blockquote>
+      <p class="testimonial-name">{testimonial.name}</p>
+      <p class="testimonial-title">{testimonial.title}</p>
+    </div>
+  ))}
+</div>
+
+<style>
+  .testimonials-carousel {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+  }
+  .testimonial {
+    flex: 0 0 auto;
+    width: 300px;
+    margin-right: 20px;
+    scroll-snap-align: start;
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
+  }
+  .testimonial-image {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-bottom: 10px;
+  }
+  blockquote {
+    font-style: italic;
+    margin-bottom: 10px;
+  }
+  .testimonial-name {
+    font-weight: bold;
+    margin-bottom: 5px;
+  }
+  .testimonial-title {
+    color: gray;
+  }
+</style>

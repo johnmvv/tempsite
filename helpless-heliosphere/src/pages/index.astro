@@ -1,0 +1,764 @@
+---
+import Layout from '../layouts/Layout.astro';
+
+// Define active link for navigation
+const activeLink = '/';
+
+// Professional titles for the typing animation
+const professionalTitles = [
+  "Software Engineer",
+  "Mathematician",
+  "Statistician",
+  "Data Analyst",
+  "Web Developer",
+  "UI/UX Designer"
+];
+---
+
+<Layout title="Home | Modern Portfolio" activeLink={activeLink}>
+  <!-- Hero Section with animated elements -->
+  <section class="hero">
+    <div class="container">
+      <div class="hero-content">
+        <div class="hero-text animate-slide-up">
+          <h1><b>Your New</b>
+            <span class="typing-wrapper">
+              <span class="typing-container">
+                <span class="typing-text"></span>
+                <span class="cursor"></span>
+              </span>
+            </span>
+          </h1>
+          <p>Building modern, responsive websites and applications with cutting-edge technologies. Let's turn your vision into reality.</p>
+          <div class="hero-buttons">
+            <a href="/projects" class="btn">View Projects</a>
+            <a href="/contact" class="btn btn-outline">Contact Me</a>
+          </div>
+          <div class="scroll-indicator">
+            <span>Scroll Down</span>
+            <i class="fas fa-chevron-down bounce"></i>
+          </div>
+        </div>
+        <div class="hero-image animate-fade-in">
+          <div class="blob-bg"></div>
+          <div class="floating-shapes">
+            <div class="shape shape-1"></div>
+            <div class="shape shape-2"></div>
+            <div class="shape shape-3"></div>
+            <div class="shape shape-4"></div>
+            <div class="shape shape-5"></div>
+          </div>
+          <div class="hero-particles" id="hero-particles"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Skills Section -->
+  <section class="skills" id="skills">
+    <div class="container">
+      <h2 class="section-heading">My <span class="text-gradient">Skills</span></h2>
+      <div class="skills-container grid grid-4">
+        <div class="skill-card">
+          <div class="skill-icon">
+            <i class="fas fa-code"></i>
+          </div>
+          <h3>Web Development</h3>
+          <p>Building responsive and performant websites with modern technologies</p>
+        </div>
+        
+        <div class="skill-card">
+          <div class="skill-icon">
+            <i class="fas fa-mobile-alt"></i>
+          </div>
+          <h3>App Development</h3>
+          <p>Creating cross-platform mobile apps with React Native</p>
+        </div>
+        
+        <div class="skill-card">
+          <div class="skill-icon">
+            <i class="fas fa-paint-brush"></i>
+          </div>
+          <h3>UI/UX Design</h3>
+          <p>Designing beautiful and intuitive user interfaces</p>
+        </div>
+        
+        <div class="skill-card">
+          <div class="skill-icon">
+            <i class="fas fa-server"></i>
+          </div>
+          <h3>Backend Development</h3>
+          <p>Building robust API services and server-side applications</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Featured Projects Section -->
+  <section class="projects" id="featured-projects">
+    <div class="container">
+      <h2 class="section-heading">Featured <span class="text-gradient">Projects</span></h2>
+      <div class="projects-container">
+        <div class="featured-project">
+          <div class="project-image">
+            <div class="image-placeholder"></div>
+            <div class="project-hover">
+              <div class="project-hover-content">
+                <h4>View Project</h4>
+                <i class="fas fa-external-link-alt"></i>
+              </div>
+            </div>
+          </div>
+          <div class="project-content">
+            <h3>E-Commerce Platform</h3>
+            <p>A full-featured online store with product management, cart functionality, and secure checkout.</p>
+            <div class="project-tech">
+              <span>React</span>
+              <span>Node.js</span>
+              <span>MongoDB</span>
+            </div>
+            <a href="/projects/ecommerce" class="btn btn-sm">View Project</a>
+          </div>
+        </div>
+        
+        <div class="featured-project reverse">
+          <div class="project-image">
+            <div class="image-placeholder"></div>
+            <div class="project-hover">
+              <div class="project-hover-content">
+                <h4>View Project</h4>
+                <i class="fas fa-external-link-alt"></i>
+              </div>
+            </div>
+          </div>
+          <div class="project-content">
+            <h3>Portfolio Website</h3>
+            <p>A modern portfolio website built with Astro featuring a dark mode slider and animated elements.</p>
+            <div class="project-tech">
+              <span>Astro</span>
+              <span>JavaScript</span>
+              <span>CSS</span>
+            </div>
+            <a href="/projects/portfolio" class="btn btn-sm">View Project</a>
+          </div>
+        </div>
+      </div>
+      <div class="text-center mt-5">
+        <a href="/projects" class="btn">All Projects</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Counter Section -->
+  <section class="counter-section">
+    <div class="container">
+      <div class="counter-grid">
+        <div class="counter-item">
+          <div class="counter-icon"><i class="fas fa-check-circle"></i></div>
+          <div class="counter-number" data-target="45">0</div>
+          <div class="counter-label">Projects Completed</div>
+        </div>
+
+        <div class="counter-item">
+          <div class="counter-icon"><i class="fas fa-users"></i></div>
+          <div class="counter-number" data-target="32">0</div>
+          <div class="counter-label">Satisfied Clients</div>
+        </div>
+
+        <div class="counter-item">
+          <div class="counter-icon"><i class="fas fa-coffee"></i></div>
+          <div class="counter-number" data-target="1250">0</div>
+          <div class="counter-label">Cups of Coffee</div>
+        </div>
+
+        <div class="counter-item">
+          <div class="counter-icon"><i class="fas fa-clock"></i></div>
+          <div class="counter-number" data-target="5">0</div>
+          <div class="counter-label">Years Experience</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Contact CTA Section -->
+  <section class="contact-cta">
+    <div class="container">
+      <div class="cta-card">
+        <h2>Ready to start your project?</h2>
+        <p>Let's discuss how I can help bring your ideas to life.</p>
+        <a href="/contact" class="btn">Get in Touch</a>
+      </div>
+    </div>
+  </section>
+</Layout>
+
+<style>
+  /* Hero Section */
+  .hero {
+    position: relative;
+    padding: 120px 0 80px;
+    overflow: hidden;
+  }
+  
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle, rgba(84, 101, 255, 0.1) 0%, rgba(255, 255, 255, 0) 70%);
+    z-index: -1;
+  }
+  
+  .hero-content {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3rem;
+    align-items: center;
+  }
+  
+  .hero-text h1 {
+    margin-bottom: 1.5rem;
+    font-weight: 800;
+    line-height: 1.1;
+  }
+
+  /* Updated Typing Animation Styles */
+  .typing-wrapper {
+    display: block;
+    color: var(--accent-primary);
+  }
+
+  .typing-container {
+    display: block;
+    position: relative;
+    line-height: 1.5;
+    min-height: 1.5em;
+  }
+  
+  .typing-text {
+    display: inline;
+    color: var(--accent-primary);
+    font-weight: 700;
+    white-space: pre-wrap;
+  }
+  
+  .cursor {
+    position: relative;
+    display: inline-block;
+    width: 3px;
+    background-color: var(--accent-primary);
+    animation: blink 0.75s infinite;
+    height: 1.2em;
+    margin-left: 1px;
+    vertical-align: text-bottom;
+  }
+  
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+  }
+  
+  .hero-text p {
+    font-size: 1.2rem;
+    margin-bottom: 2rem;
+    color: var(--text-secondary);
+    max-width: 550px;
+  }
+  
+  .hero-buttons {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+  
+  /* Scroll indicator */
+  .scroll-indicator {
+    margin-top: 3rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    opacity: 0.8;
+  }
+  
+  .scroll-indicator .bounce {
+    animation: bounce 2s infinite;
+  }
+  
+  @keyframes bounce {
+    0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+    40% { transform: translateY(-10px); }
+    60% { transform: translateY(-5px); }
+  }
+  
+  .hero-image {
+    position: relative;
+    height: 400px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  /* Blob background in hero section */
+  .blob-bg {
+    width: 320px;
+    height: 320px;
+    background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%);
+    border-radius: 60% 40% 70% 30% / 50% 60% 40% 50%;
+    opacity: 0.8;
+    position: absolute;
+    animation: blob-animation 8s infinite ease-in-out;
+  }
+  
+  @keyframes blob-animation {
+    0% { border-radius: 60% 40% 70% 30% / 50% 60% 40% 50%; }
+    25% { border-radius: 30% 70% 40% 60% / 40% 30% 70% 60%; }
+    50% { border-radius: 50% 50% 30% 70% / 60% 40% 60% 40%; }
+    75% { border-radius: 70% 30% 50% 50% / 30% 60% 40% 70%; }
+    100% { border-radius: 60% 40% 70% 30% / 50% 60% 40% 50%; }
+  }
+  
+  /* Hero particles container */
+  .hero-particles {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+  }
+  
+  /* Floating shapes animation */
+  .floating-shapes {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+  }
+  
+  .shape {
+    position: absolute;
+    border-radius: var(--border-radius);
+    filter: blur(2px);
+  }
+  
+  .shape-1 {
+    width: 60px;
+    height: 60px;
+    background-color: rgba(84, 101, 255, 0.7);
+    top: 20%;
+    left: 10%;
+    animation: float 6s infinite ease-in-out;
+  }
+  
+  .shape-2 {
+    width: 40px;
+    height: 40px;
+    background-color: rgba(120, 139, 255, 0.5);
+    bottom: 30%;
+    right: 15%;
+    animation: float 8s infinite ease-in-out reverse;
+  }
+  
+  .shape-3 {
+    width: 25px;
+    height: 25px;
+    background-color: rgba(255, 255, 255, 0.6);
+    bottom: 20%;
+    left: 20%;
+    animation: float 5s infinite ease-in-out 1s;
+  }
+  
+  .shape-4 {
+    width: 35px;
+    height: 35px;
+    background-color: rgba(84, 101, 255, 0.4);
+    top: 35%;
+    right: 20%;
+    animation: float 7s infinite ease-in-out 0.5s;
+    border-radius: 50%;
+  }
+  
+  .shape-5 {
+    width: 30px;
+    height: 30px;
+    background-color: rgba(120, 139, 255, 0.3);
+    top: 60%;
+    left: 30%;
+    animation: float 9s infinite ease-in-out 2s;
+    border-radius: 50%;
+  }
+  
+  @keyframes float {
+    0% { transform: translateY(0) rotate(0deg); }
+    50% { transform: translateY(-20px) rotate(10deg); }
+    100% { transform: translateY(0) rotate(0deg); }
+  }
+  
+  /* Skills Section */
+  .skills {
+    padding: 100px 0;
+    background-color: var(--bg-secondary);
+  }
+  
+  .section-heading {
+    text-align: center;
+    margin-bottom: 3rem;
+    font-size: 2.5rem;
+  }
+  
+  .skill-card {
+    background-color: var(--card-bg);
+    border-radius: var(--border-radius);
+    padding: 2rem;
+    text-align: center;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    box-shadow: 0 10px 30px var(--shadow-color);
+  }
+  
+  .skill-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 15px 35px var(--shadow-color);
+  }
+  
+  .skill-icon {
+    font-size: 2.5rem;
+    margin-bottom: 1.5rem;
+    color: var(--accent-primary);
+    background: rgba(84, 101, 255, 0.1);
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .skill-card h3 {
+    margin-bottom: 1rem;
+  }
+  
+  .skill-card p {
+    font-size: 0.95rem;
+    color: var(--text-secondary);
+  }
+  
+  /* Featured Projects Section */
+  .projects {
+    padding: 100px 0;
+  }
+  
+  .projects-container {
+    display: flex;
+    flex-direction: column;
+    gap: 5rem;
+  }
+  
+  .featured-project {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3rem;
+    align-items: center;
+  }
+  
+  .featured-project.reverse {
+    grid-template-columns: 1fr 1fr;
+    direction: rtl;
+  }
+  
+  .featured-project.reverse .project-content {
+    direction: ltr;
+  }
+  
+  .project-image {
+    border-radius: var(--border-radius);
+    overflow: hidden;
+    height: 300px;
+    position: relative;
+  }
+  
+  .image-placeholder {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, var(--bg-secondary), var(--border-color));
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.5rem;
+    color: var(--text-secondary);
+  }
+  
+  /* Project hover effect */
+  .project-hover {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(84, 101, 255, 0.9);
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+  
+  .project-image:hover .project-hover {
+    opacity: 1;
+  }
+  
+  .project-hover-content {
+    text-align: center;
+  }
+  
+  .project-hover-content h4 {
+    margin-bottom: 0.5rem;
+    font-size: 1.3rem;
+  }
+  
+  .project-hover-content i {
+    font-size: 1.5rem;
+  }
+  
+  .project-content h3 {
+    font-size: 1.8rem;
+    margin-bottom: 1rem;
+  }
+  
+  .project-content p {
+    margin-bottom: 1.5rem;
+    color: var(--text-secondary);
+  }
+  
+  .project-tech {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+  }
+  
+  .project-tech span {
+    background-color: var(--bg-secondary);
+    padding: 0.35rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 500;
+  }
+  
+  .btn-sm {
+    padding: 0.5rem 1.2rem;
+    font-size: 0.9rem;
+  }
+  
+  /* Counter Section */
+  .counter-section {
+    padding: 80px 0;
+    background-color: var(--bg-secondary);
+  }
+  
+  .counter-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 2rem;
+  }
+  
+  .counter-item {
+    background-color: var(--card-bg);
+    border-radius: var(--border-radius);
+    padding: 2.5rem 1.5rem;
+    text-align: center;
+    box-shadow: 0 10px 30px var(--shadow-color);
+    transition: transform 0.3s ease;
+  }
+  
+  .counter-item:hover {
+    transform: translateY(-10px);
+  }
+  
+  .counter-icon {
+    font-size: 2.5rem;
+    color: var(--accent-primary);
+    margin-bottom: 1.5rem;
+  }
+  
+  .counter-number {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    background: linear-gradient(to right, var(--accent-primary), var(--accent-secondary));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  
+  .counter-label {
+    color: var(--text-secondary);
+    font-weight: 500;
+  }
+  
+  /* Contact CTA Section */
+  .contact-cta {
+    padding: 80px 0;
+    background-color: var(--bg-secondary);
+  }
+  
+  .cta-card {
+    background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%);
+    border-radius: var(--border-radius);
+    padding: 3rem;
+    text-align: center;
+    color: white;
+  }
+  
+  .cta-card h2 {
+    font-size: 2.2rem;
+    margin-bottom: 1rem;
+  }
+  
+  .cta-card p {
+    font-size: 1.2rem;
+    margin-bottom: 2rem;
+    opacity: 0.9;
+  }
+  
+  .cta-card .btn {
+    background-color: white;
+    color: var(--accent-primary);
+    font-weight: 600;
+  }
+  
+  .cta-card .btn:hover {
+    transform: translateY(-3px);
+    background-color: white;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+  }
+  
+  /* Responsive Adjustments */
+  @media (max-width: 992px) {
+    .hero-content {
+      grid-template-columns: 1fr;
+      text-align: center;
+    }
+    
+    .hero-text p {
+      margin: 0 auto 2rem;
+    }
+    
+    .hero-buttons {
+      justify-content: center;
+    }
+    
+    .featured-project, .featured-project.reverse {
+      grid-template-columns: 1fr;
+      direction: ltr;
+      gap: 2rem;
+    }
+    
+    .counter-grid {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+  
+  @media (max-width: 576px) {
+    .counter-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const professionalTitles = [
+      "Software Engineer",
+      "Mathematician",
+      "Statistician",
+      "Data Analyst",
+      "Web Developer",
+      "UI/UX Designer"
+    ];
+    
+    const typingText = document.querySelector('.typing-text');
+    const cursor = document.querySelector('.cursor');
+    let titleIndex = 0;
+    let charIndex = 0;
+    let isDeleting = false;
+    let typingSpeed = 100;
+    
+    function type() {
+      const currentTitle = professionalTitles[titleIndex];
+      
+      if (isDeleting) {
+        typingText.textContent = currentTitle.substring(0, charIndex - 1);
+        charIndex--;
+        typingSpeed = 50;
+      } else {
+        typingText.textContent = currentTitle.substring(0, charIndex + 1);
+        charIndex++;
+        typingSpeed = 100;
+      }
+      
+      if (!isDeleting && charIndex === currentTitle.length) {
+        isDeleting = true;
+        typingSpeed = 1000;
+      } else if (isDeleting && charIndex === 0) {
+        isDeleting = false;
+        titleIndex = (titleIndex + 1) % professionalTitles.length;
+        typingSpeed = 300;
+      }
+      
+      setTimeout(type, typingSpeed);
+    }
+    
+    setTimeout(type, 1000);
+    
+    // Counters animation
+    const counters = document.querySelectorAll('.counter-number');
+    
+    function animateCounters() {
+      counters.forEach(counter => {
+        const target = parseInt(counter.getAttribute('data-target'));
+        const duration = 2000; // Animation duration in ms
+        const startTime = performance.now();
+        
+        function updateCounter(currentTime) {
+          const elapsedTime = currentTime - startTime;
+          const progress = Math.min(elapsedTime / duration, 1);
+          
+          // Using easeOutQuad for smoother counting
+          const easeProgress = 1 - (1 - progress) * (1 - progress);
+          
+          const currentValue = Math.floor(easeProgress * target);
+          counter.textContent = currentValue;
+          
+          if (progress < 1) {
+            requestAnimationFrame(updateCounter);
+          } else {
+            counter.textContent = target;
+          }
+        }
+        
+        requestAnimationFrame(updateCounter);
+      });
+    }
+    
+    // Trigger counter animation when scrolling to the section
+    const counterSection = document.querySelector('.counter-section');
+    const observer = new IntersectionObserver((entries) => {
+      if (entries[0].isIntersecting) {
+        animateCounters();
+        observer.unobserve(counterSection);
+      }
+    }, { threshold: 0.5 });
+    
+    if (counterSection) {
+      observer.observe(counterSection);
+    }
+  });
+</script>

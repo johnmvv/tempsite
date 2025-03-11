@@ -1,0 +1,442 @@
+---
+import Layout from '../layouts/Layout.astro';
+
+// Define active link for navigation
+const activeLink = '/projects';
+
+// Project categories for filtering
+const categories = ['All', 'Web App', 'Mobile', 'UI/UX', 'Backend'];
+
+// Projects data
+const projects = [
+  {
+    title: 'E-Commerce Platform',
+    category: 'Web App',
+    description: 'A full-featured online store with product management, cart functionality, and secure checkout.',
+    image: '',
+    technologies: ['React', 'Node.js', 'MongoDB', 'Express', 'Stripe API'],
+    link: '/projects/ecommerce'
+  },
+  {
+    title: 'Fitness Tracking App',
+    category: 'Mobile',
+    description: 'A cross-platform mobile app for tracking workouts, nutrition, and fitness progress.',
+    image: '',
+    technologies: ['React Native', 'Firebase', 'Redux', 'Chart.js'],
+    link: '/projects/fitness-app'
+  },
+  {
+    title: 'Agency Website Redesign',
+    category: 'UI/UX',
+    description: 'Complete redesign of a digital agency website focusing on user experience and conversion optimization.',
+    image: '',
+    technologies: ['Figma', 'HTML/CSS', 'JavaScript', 'GSAP'],
+    link: '/projects/agency-redesign'
+  },
+  {
+    title: 'Content Management System',
+    category: 'Backend',
+    description: 'Custom CMS built for a media company to manage articles, users, and digital assets.',
+    image: '',
+    technologies: ['PHP', 'Laravel', 'MySQL', 'Vue.js', 'AWS'],
+    link: '/projects/cms'
+  },
+  {
+    title: 'Task Management App',
+    category: 'Web App',
+    description: 'Collaborative task management platform with real-time updates and team collaboration features.',
+    image: '',
+    technologies: ['Next.js', 'TypeScript', 'Socket.io', 'PostgreSQL'],
+    link: '/projects/task-app'
+  },
+  {
+    title: 'Restaurant Ordering System',
+    category: 'Mobile',
+    description: 'Mobile app for restaurants allowing customers to browse menus, place orders, and make payments.',
+    image: '',
+    technologies: ['Flutter', 'Dart', 'Firebase', 'Stripe'],
+    link: '/projects/restaurant-app'
+  }
+];
+---
+
+<Layout title="Projects | Modern Portfolio" activeLink={activeLink}>
+  <!-- Projects Hero Section -->
+  <section class="projects-hero">
+    <div class="container">
+      <h1>My <span class="text-gradient">Projects</span></h1>
+      <p class="lead">A showcase of my best work, personal projects, and client solutions.</p>
+    </div>
+  </section>
+
+  <!-- Project Filter Section -->
+  <section class="project-filter">
+    <div class="container">
+      <div class="filter-container">
+        {categories.map(category => (
+          <button class="filter-btn" data-category={category}>{category}</button>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- Projects Grid -->
+  <section class="projects-grid">
+    <div class="container">
+      <div class="projects-container">
+        {projects.map(project => (
+          <div class="project-card" data-category={project.category}>
+            <div class="project-image">
+              {project.image ? 
+                <img src={project.image} alt={project.title} /> : 
+                <div class="image-placeholder">
+                  <span>{project.title[0]}</span>
+                </div>
+              }
+            </div>
+            <div class="project-content">
+              <div class="project-category">{project.category}</div>
+              <h3>{project.title}</h3>
+              <p>{project.description}</p>
+              <div class="project-tech">
+                {project.technologies.map(tech => (
+                  <span>{tech}</span>
+                ))}
+              </div>
+              <a href={project.link} class="btn btn-sm">View Details</a>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- Contact CTA Section -->
+  <section class="contact-cta">
+    <div class="container">
+      <div class="cta-card">
+        <h2>Have a project in mind?</h2>
+        <p>Let's collaborate to bring your vision to life with cutting-edge technology.</p>
+        <a href="/contact" class="btn">Get in Touch</a>
+      </div>
+    </div>
+  </section>
+</Layout>
+
+<style>
+  /* Projects Hero Section */
+  .projects-hero {
+    padding: 120px 0 60px;
+    text-align: center;
+  }
+  
+  .projects-hero h1 {
+    font-size: 3.5rem;
+    margin-bottom: 1rem;
+  }
+  
+  .projects-hero .lead {
+    font-size: 1.3rem;
+    color: var(--text-secondary);
+    max-width: 700px;
+    margin: 0 auto;
+  }
+  
+  /* Project Filter Section */
+  .project-filter {
+    padding: 20px 0 40px;
+  }
+  
+  .filter-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    justify-content: center;
+  }
+  
+  .filter-btn {
+    background-color: var(--bg-secondary);
+    border: none;
+    padding: 0.5rem 1.5rem;
+    border-radius: 30px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    color: var(--text-primary);
+  }
+  
+  .filter-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px var(--shadow-color);
+  }
+  
+  .filter-btn.active {
+    background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%);
+    color: white;
+  }
+  
+  /* Projects Grid */
+  .projects-grid {
+    padding: 20px 0 100px;
+  }
+  
+  .projects-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 2rem;
+    grid-auto-flow: dense; /* This helps fill gaps */
+  }
+  
+  .project-card {
+    background-color: var(--card-bg);
+    border-radius: var(--border-radius);
+    overflow: hidden;
+    box-shadow: 0 10px 30px var(--shadow-color);
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .project-card.hidden {
+    display: none;
+  }
+  
+  .project-image {
+    height: 200px;
+    overflow: hidden;
+  }
+  
+  .project-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+  }
+  
+  .project-card:hover .project-image img {
+    transform: scale(1.05);
+  }
+  
+  .image-placeholder {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 3rem;
+    font-weight: 700;
+    color: white;
+  }
+  
+  .project-content {
+    padding: 1.5rem;
+  }
+  
+  .project-category {
+    display: inline-block;
+    background-color: rgba(84, 101, 255, 0.1);
+    color: var(--accent-primary);
+    padding: 0.3rem 0.8rem;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin-bottom: 0.8rem;
+  }
+  
+  .project-content h3 {
+    margin-bottom: 0.8rem;
+    font-size: 1.5rem;
+  }
+  
+  .project-content p {
+    margin-bottom: 1.5rem;
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+  }
+  
+  .project-tech {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+  }
+  
+  .project-tech span {
+    background-color: var(--bg-secondary);
+    padding: 0.3rem 0.7rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+  }
+  
+  /* Contact CTA Section - Same as Home page */
+  .contact-cta {
+    padding: 80px 0;
+    background-color: var(--bg-secondary);
+  }
+  
+  .cta-card {
+    background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%);
+    border-radius: var(--border-radius);
+    padding: 3rem;
+    text-align: center;
+    color: white;
+  }
+  
+  .cta-card h2 {
+    font-size: 2.2rem;
+    margin-bottom: 1rem;
+  }
+  
+  .cta-card p {
+    font-size: 1.2rem;
+    margin-bottom: 2rem;
+    opacity: 0.9;
+  }
+  
+  .cta-card .btn {
+    background-color: white;
+    color: var(--accent-primary);
+    font-weight: 600;
+  }
+  
+  .cta-card .btn:hover {
+    transform: translateY(-3px);
+    background-color: white;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+  }
+  
+  /* Project Filter Animation Enhancements */
+  .project-card {
+    opacity: 1;
+    transform: translateY(0);
+    transition: opacity 0.4s ease, transform 0.4s ease;
+  }
+  
+  .project-card.fade-out {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  
+  .project-card.fade-in {
+    animation: fadeInUp 0.4s ease forwards;
+  }
+  
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  .filter-btn {
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .filter-btn::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    width: 0;
+    height: 2px;
+    background: var(--accent-primary);
+    transition: all 0.3s ease;
+    transform: translateX(-50%);
+  }
+  
+  .filter-btn:hover::after {
+    width: 80%;
+  }
+  
+  .filter-btn.active::after {
+    width: 100%;
+  }
+  
+  /* Responsive Adjustments */
+  @media (max-width: 768px) {
+    .projects-container {
+      grid-template-columns: 1fr;
+    }
+    
+    .project-image {
+      height: 180px;
+    }
+  }
+</style>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const filterBtns = document.querySelectorAll('.filter-btn');
+    const projectsContainer = document.querySelector('.projects-container');
+    const projects = document.querySelectorAll('.project-card');
+    let currentCategory = 'All';
+    
+    // Set 'All' button as active by default
+    const allButton = document.querySelector('[data-category="All"]');
+    if (allButton) allButton.classList.add('active');
+    
+    // Filter projects with enhanced animations
+    const filterProjects = (category) => {
+      if (category === currentCategory) return;
+      currentCategory = category;
+      
+      // Reset all buttons
+      filterBtns.forEach(btn => btn.classList.remove('active'));
+      
+      // Add active class to clicked button
+      const activeBtn = document.querySelector(`[data-category="${category}"]`);
+      if (activeBtn) activeBtn.classList.add('active');
+      
+      // Get all projects that will be visible
+      const visibleProjects = Array.from(projects).filter(project => {
+        const projectCategory = project.getAttribute('data-category');
+        return category === 'All' || category === projectCategory;
+      });
+      
+      // Hide all projects first with fade out
+      projects.forEach(project => {
+        project.style.opacity = '0';
+        project.style.transform = 'scale(0.95)';
+      });
+      
+      // After fade out, update visibility and animate in
+      setTimeout(() => {
+        projects.forEach(project => {
+          const projectCategory = project.getAttribute('data-category');
+          const isVisible = category === 'All' || category === projectCategory;
+          
+          if (!isVisible) {
+            project.classList.add('hidden');
+          } else {
+            project.classList.remove('hidden');
+          }
+        });
+        
+        // Force a reflow to trigger the layout update
+        projectsContainer.offsetHeight;
+        
+        // Animate visible projects back in with stagger
+        visibleProjects.forEach((project, index) => {
+          setTimeout(() => {
+            project.style.opacity = '1';
+            project.style.transform = 'translateY(0) scale(1)';
+          }, index * 100);
+        });
+      }, 300);
+    };
+    
+    // Add click event to filter buttons
+    filterBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const category = btn.getAttribute('data-category');
+        filterProjects(category);
+      });
+    });
+  });
+</script>
