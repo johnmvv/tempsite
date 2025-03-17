@@ -6,51 +6,64 @@ const activeLink = '/about';
 
 // Skills data for the interactive skill bars
 const skills = [
-  { name: 'HTML/CSS', level: 95 },
+  { name: 'Python', level: 90 },
+  { name: 'Java', level: 85 },
   { name: 'JavaScript', level: 90 },
-  { name: 'TypeScript', level: 85 },
-  { name: 'React', level: 88 },
-  { name: 'Node.js', level: 80 },
-  { name: 'UI/UX Design', level: 75 },
-  { name: 'Astro', level: 85 },
-  { name: 'GraphQL', level: 70 },
+  { name: 'C#', level: 80 },
+  { name: 'SQL', level: 75 },
+  { name: 'LaTeX', level: 70 },
+  { name: 'R', level: 65 },
+  { name: '.NET', level: 80 },
+  { name: 'Google BigQuery', level: 70 },
+  { name: 'PostgreSQL', level: 75 },
+  { name: 'Pandas', level: 85 },
+  { name: 'Numpy', level: 80 },
+  { name: 'SciPy', level: 75 },
+  { name: 'Visual Studio', level: 85 },
+  { name: 'Eclipse', level: 80 },
+  { name: 'Jupyter', level: 90 },
+  { name: 'Git', level: 85 },
 ];
 
 // Experience timeline data
 const experiences = [
   {
-    title: 'Senior Frontend Developer',
-    company: 'Tech Solutions Inc.',
-    period: '2021 - Present',
-    description: 'Lead the frontend development team in creating innovative web applications with React, TypeScript, and GraphQL. Improved site performance by 40% and implemented CI/CD pipelines.'
-  },
-  {
-    title: 'Web Developer',
-    company: 'Digital Creatives',
-    period: '2018 - 2021',
-    description: 'Developed responsive websites and e-commerce platforms for various clients. Worked with React, Vue.js, and WordPress to create custom solutions.'
-  },
-  {
-    title: 'Junior Developer',
-    company: 'StartUp Innovations',
-    period: '2016 - 2018',
-    description: 'Built and maintained web applications using JavaScript and PHP. Collaborated with UX designers to implement intuitive user interfaces.'
+    title: 'Freelance Software Engineer',
+    company: 'Self-Employed',
+    period: 'Feb 2024 – Current',
+    description: 'Developed custom software solutions using Python, Java, JavaScript, and C# to meet client needs. Critiqued and improved client code for better function, readability, and performance. Delivered performance improvements, resulting in faster execution times and smoother user experience. Collaborated with teams on AI-driven projects, implementing optimized algorithms for predictive analytics and data processing.'
   }
 ];
 
 // Education timeline data
 const education = [
   {
-    degree: 'Master of Computer Science',
-    institution: 'Tech University',
-    period: '2014 - 2016',
-    description: 'Specialized in Web Technologies and Human-Computer Interaction.'
+    institution: 'Oxford University',
+    degree: 'MMath - (OFFER)',
+    period: 'Sept 2025 -',
+    details: ['Aiming for a 1st']
   },
   {
-    degree: 'Bachelor of Science in Computer Science',
-    institution: 'State University',
-    period: '2010 - 2014',
-    description: 'Graduated with honors. Active member of the Web Development Club.'
+    institution: 'Exeter Mathematics School',
+    degree: 'A levels - (Predicted)',
+    period: 'Sept 2023 – July 2025',
+    details: [
+      'A* in Mathematics',
+      'A* in Further Mathematics',
+      'A* in Computer Science',
+      'A* in Physics'
+    ]
+  },
+  {
+    institution: 'Frome Community College',
+    degree: 'GCSEs',
+    period: 'Sept 2020 – July 2023',
+    details: [
+      '9 in Mathematics, Further Mathematics, Computer Science, Chemistry, Physics',
+      '8 in English Language, Biology, Geography, Design & Technology',
+      '7 in Spanish, Astronomy',
+      '6 in English Literature'
+    ]
   }
 ];
 ---
@@ -70,8 +83,10 @@ const education = [
         </div>
         <div class="about-text animate-slide-up">
           <h1>About <span class="text-gradient">Me</span></h1>
-          <p class="lead">Passionate developer crafting beautiful digital experiences with modern technologies.</p>
-          <p>With over 5 years of experience in web development, I specialize in creating responsive, user-friendly websites and applications that deliver exceptional user experiences. My expertise spans from frontend technologies like React and Vue.js to backend development with Node.js.</p>
+          <p>Mathematician and Freelance programmer with extensive experience in optimizing data processing algorithms
+and conducting code reviews for AI-driven projects. Proficient in Python, Java, C, and statistical analysis,
+with a focus on delivering performance improvements and collaborative problem-solving. Passionate about
+leveraging technology for predictive analytics, complex problem-solving, and continuous improvement.</p>
           <p>I'm dedicated to writing clean, maintainable code and staying up-to-date with the latest industry trends and technologies.</p>
           <div class="about-actions">
             <a href="/contact" class="btn">Get In Touch</a>
@@ -127,16 +142,23 @@ const education = [
   <section class="education-section" id="education">
     <div class="container">
       <h2 class="section-heading">My <span class="text-gradient">Education</span></h2>
-      
       <div class="education-container">
-        {education.map((edu) => (
-          <div class="education-card">
-            <div class="education-card-header">
-              <h3>{edu.degree}</h3>
-              <div class="education-period">{edu.period}</div>
+        {education.map((edu, index) => (
+          <div class="education-card" data-edu-index={index}>
+            <div class="education-card-main">
+              <div class="education-card-header">
+                <h3>{edu.degree}</h3>
+                <div class="education-period">{edu.period}</div>
+              </div>
+              <h4>{edu.institution}</h4>
             </div>
-            <h4>{edu.institution}</h4>
-            <p>{edu.description}</p>
+            {edu.details && edu.details.length > 0 && (
+              <div class="education-card-details">
+                {edu.details.map(detail => (
+                  <p>{detail}</p>
+                ))}
+              </div>
+            )}
           </div>
         ))}
       </div>
@@ -149,7 +171,7 @@ const education = [
       <h2 class="section-heading">Hobbies & <span class="text-gradient">Interests</span></h2>
       
       <div class="interests-grid grid grid-3">
-        <div class="interest-card">
+        <div class="interest-card" id="reading">
           <div class="interest-icon">
             <i class="fas fa-book"></i>
           </div>
@@ -157,7 +179,7 @@ const education = [
           <p>I enjoy reading technical books, science fiction, and philosophy in my spare time.</p>
         </div>
         
-        <div class="interest-card">
+        <div class="interest-card" id="hiking">
           <div class="interest-icon">
             <i class="fas fa-mountain"></i>
           </div>
@@ -165,7 +187,7 @@ const education = [
           <p>Exploring nature trails and mountains helps me stay refreshed and inspired.</p>
         </div>
         
-        <div class="interest-card">
+        <div class="interest-card" id="photography">
           <div class="interest-icon">
             <i class="fas fa-camera"></i>
           </div>
@@ -371,6 +393,12 @@ const education = [
     opacity: 0;
     transform: translateY(30px);
     transition: all 0.5s ease;
+    cursor: pointer;
+    height: fit-content;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    min-height: 120px;
   }
   
   .education-card.animate {
@@ -378,10 +406,33 @@ const education = [
     transform: translateY(0);
   }
   
+  .education-card-content {
+    flex: 1;
+  }
+  
+  .education-card-details {
+    height: 0;
+    overflow: hidden;
+    opacity: 0;
+    transition: all 0.3s ease;
+    margin: 0;
+    padding: 0;
+    transform-origin: top;
+  }
+  
+  .education-card-details.active {
+    height: auto;
+    opacity: 1;
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border-color);
+  }
+    
   /* Education Section */
   .education-section {
     padding: 100px 0;
     background-color: var(--bg-secondary);
+    position: relative;
   }
   
   .education-container {
@@ -389,6 +440,7 @@ const education = [
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
     gap: 2rem;
+    grid-auto-rows: 1fr;
   }
   
   .education-card {
@@ -397,10 +449,30 @@ const education = [
     padding: 2rem;
     box-shadow: 0 10px 30px var(--shadow-color);
     transition: transform 0.3s ease;
+    cursor: pointer;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    height: fit-content;
   }
   
   .education-card:hover {
     transform: translateY(-10px);
+  }
+  
+  .education-card::after {
+    content: "Click to see details";
+    position: absolute;
+    bottom: 1rem;
+    right: 1rem;
+    font-size: 0.8rem;
+    color: var(--accent-primary);
+    opacity: 0.7;
+    transition: opacity 0.3s ease;
+  }
+
+  .education-card:has(.education-card-details.active)::after {
+    opacity: 0;
   }
   
   .education-card-header {
@@ -408,6 +480,8 @@ const education = [
     justify-content: space-between;
     align-items: flex-start;
     margin-bottom: 1rem;
+    flex-wrap: wrap;
+    gap: 0.5rem;
   }
   
   .education-card h3 {
@@ -561,4 +635,43 @@ const education = [
       card.style.transitionDelay = `${index * 0.15}s`;
     });
   });
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const cards = document.querySelectorAll('.education-card');
+    
+    cards.forEach(card => {
+      card.addEventListener('click', (e) => {
+        const details = card.querySelector('.education-card-details');
+        if (!details) return;
+        
+        // Close all other details first
+        cards.forEach(otherCard => {
+          if (otherCard !== card) {
+            const otherDetails = otherCard.querySelector('.education-card-details');
+            if (otherDetails) {
+              otherDetails.classList.remove('active');
+              otherDetails.style.height = '0';
+              otherDetails.style.opacity = '0';
+              otherDetails.style.margin = '0';
+              otherDetails.style.padding = '0';
+            }
+          }
+        });
+        
+        // Toggle current card's details
+        if (details.classList.contains('active')) {
+          details.style.height = '0';
+          details.style.opacity = '0';
+          details.style.margin = '0';
+          details.style.padding = '0';
+          details.classList.remove('active');
+        } else {
+          details.classList.add('active');
+          details.style.height = details.scrollHeight + 'px';
+          details.style.opacity = '1';
+        }
+      });
+    });
+  });
+  
 </script>

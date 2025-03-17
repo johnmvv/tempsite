@@ -42,18 +42,15 @@ const navLinks = [
     <div class="navbar-right">
       <div class="dark-mode-container">
         <span class="dark-mode-icon">🌓</span>
-        <div class="dark-mode-slider-container">
+        <label class="dark-mode-toggle-container">
           <input 
-            type="range" 
-            id="darkModeSlider" 
-            min="0" 
-            max="1" 
-            step="0.01" 
-            value="0"
-            aria-label="Adjust dark mode level"
+            type="checkbox" 
+            id="darkModeToggle" 
+            class="dark-mode-toggle"
+            aria-label="Toggle dark mode"
           />
-          <div class="slider-track"></div>
-        </div>
+          <span class="toggle-slider"></span>
+        </label>
       </div>
       
       <button class="mobile-nav-toggle" aria-label="Toggle menu">
@@ -72,7 +69,23 @@ const navLinks = [
     const navbar = document.getElementById('navbar');
     const mobileNavToggle = document.querySelector('.mobile-nav-toggle');
     const navLinks = document.querySelector('.nav-links');
-    const darkModeSlider = document.getElementById('darkModeSlider') as HTMLInputElement;
+    const darkModeToggle = document.getElementById('darkModeToggle') as HTMLInputElement;
+    
+    // Rage mode and racing game tracking
+    let toggleCount = 0;
+    let lastToggleTime = Date.now();
+    let rageMode = false;
+    let racingGameMode = false;
+    let rainbowInterval: number | null = null;
+    let eurobeatAudio: HTMLAudioElement | null = null;
+    
+    // Racing game variables
+    let carPosition = 50; // car horizontal position (%)
+    let carSpeed = 0;
+    let roadSpeed = 5;
+    let gameLoopInterval: number | null = null;
+    let gameScore = 0;
+    let obstacles: Array<{x: number, y: number, width: number, height: number}> = [];
     
     // Scroll handling for floating navbar
     let lastScrollY = window.scrollY;
@@ -101,21 +114,393 @@ const navLinks = [
       mobileNavToggle.classList.toggle('open');
     });
     
-    // Dark mode slider
-    darkModeSlider?.addEventListener('input', (e) => {
+    // Dark mode toggle with rage mode and racing game
+    darkModeToggle?.addEventListener('change', (e) => {
       const target = e.target as HTMLInputElement;
-      const darkLevel = parseFloat(target.value);
-      document.body.style.setProperty('--dark-level', target.value);
+      const currentTime = Date.now();
+      const timeSinceLastToggle = currentTime - lastToggleTime;
       
-      // Save preference to localStorage
-      localStorage.setItem('darkLevel', target.value);
+      // Regular dark mode functionality
+      document.body.style.setProperty('--dark-level', target.checked ? '1' : '0');
+      localStorage.setItem('darkMode', String(target.checked));
+      
+      // Reset counter if too much time has passed between toggles
+      if (timeSinceLastToggle > 2000) {
+        toggleCount = 0;
+        
+        // Reset rage effects if active
+        if (rageMode) {
+          disableRageMode();
+        }
+        
+        // Reset racing game if active
+        if (racingGameMode) {
+          disableRacingGame();
+        }
+      }
+      
+      // Count toggles that happen in quick succession
+      if (timeSinceLastToggle < 500) {
+        toggleCount++;
+      } else {
+        toggleCount = 1;
+      }
+      
+      lastToggleTime = currentTime;
+      
+      // Activate rage mode if toggling fast enough (5+ toggles)
+      if (toggleCount >= 5 && !rageMode && !racingGameMode) {
+        enableRageMode();
+      }
+      
+      // Activate racing game if continuing to spam in rage mode (10+ toggles)
+      if (toggleCount >= 10 && rageMode && !racingGameMode) {
+        enableRacingGame();
+      }
     });
     
+    // Enable rage mode with rainbow flashing effects
+    function enableRageMode() {
+      rageMode = true;
+      document.body.classList.add('rage-mode');
+      
+      // Create root element for CSS variables if needed
+      if (!document.documentElement.style.getPropertyValue('--rainbow-hue')) {
+        document.documentElement.style.setProperty('--rainbow-hue', '0');
+      }
+      
+      // Start the rainbow color interval
+      if (!rainbowInterval) {
+        let hue = 0;
+        rainbowInterval = window.setInterval(() => {
+          hue = (hue + 30) % 360;
+          document.documentElement.style.setProperty('--rainbow-hue', `${hue}`);
+        }, 100);
+      }
+    }
+    
+    // Disable rage mode
+    function disableRageMode() {
+      rageMode = false;
+      document.body.classList.remove('rage-mode');
+      
+      if (rainbowInterval) {
+        clearInterval(rainbowInterval);
+        rainbowInterval = null;
+      }
+    }
+    
+    function disableRacingGame() {
+      racingGameMode = false;
+      document.body.classList.remove('racing-game-mode');
+      
+      // Remove game elements
+      const gameElement = document.getElementById('racing-game');
+      if (gameElement) {
+        document.body.removeChild(gameElement);
+      }
+      
+      // Stop game loop
+      if (gameLoopInterval) {
+        clearInterval(gameLoopInterval);
+        gameLoopInterval = null;
+      }
+      
+      // Stop music
+      if (eurobeatAudio) {
+        eurobeatAudio.pause();
+        eurobeatAudio = null;
+      }
+      
+      // Remove event listeners
+      window.removeEventListener('keydown', handleKeyDown);
+      
+      // Reset game variables
+      carPosition = 50;
+      carSpeed = 0;
+      roadSpeed = 5;
+      gameScore = 0;
+      obstacles = [];
+      if (rainbowInterval) {
+        clearInterval(rainbowInterval);
+        rainbowInterval = null;
+      }
+    }
+
+    // Enable racing game mode with eurobeat
+    function enableRacingGame() {
+      racingGameMode = true;
+      rageMode = false;
+      document.body.classList.remove('rage-mode');
+      document.body.classList.add('racing-game-mode');
+      
+      // Create game container
+      const gameContainer = document.createElement('div');
+      gameContainer.id = 'racing-game';
+      gameContainer.innerHTML = `
+        <div class="game-overlay">
+          <div class="road">
+            <div class="road-line"></div>
+            <div class="road-line"></div>
+            <div class="road-line"></div>
+            <div class="road-line"></div>
+            <div class="road-line"></div>
+          </div>
+          <div class="car"></div>
+          <div class="score">SCORE: 0</div>
+          <div class="game-message">Use ← → arrow keys to drive!</div>
+        </div>
+      `;
+      document.body.appendChild(gameContainer);
+      
+      // Play eurobeat music
+      eurobeatAudio = new Audio('https://ia801504.us.archive.org/14/items/InitialD4/Deja%20Vu.mp3');
+      eurobeatAudio.volume = 0.5;
+      eurobeatAudio.loop = true;
+      eurobeatAudio.play();
+      
+      // Reset game variables
+      carPosition = 50;
+      carSpeed = 0;
+      roadSpeed = 5;
+      gameScore = 0;
+      obstacles = [];
+      
+      // Keyboard controls
+      window.addEventListener('keydown', handleKeyDown);
+      
+      // Start game loop
+      startGameLoop();
+    }
+
+    function startGameLoop() {
+      if (gameLoopInterval) return;
+
+      gameLoopInterval = window.setInterval(() => {
+        if (!racingGameMode) {
+          return;
+        }
+        
+        carPosition += carSpeed;
+        carPosition = Math.max(5, Math.min(95, carPosition));
+
+        if (Math.random() < 0.05) {
+          createObstacle();
+        }
+        moveObstacles();
+        checkCollisions();
+        gameScore += 1;
+        const scoreElement = document.querySelector('.score');
+        if (scoreElement) {
+          scoreElement.textContent = `SCORE: ${gameScore}`;
+        }
+        
+        updateGameVisuals();
+
+        if (gameScore % 1000 === 0) {
+          roadSpeed += 1;
+        }
+      }, 20);
+    }
+
+    function handleKeyDown(e: KeyboardEvent) {
+      if (!racingGameMode) return;
+      
+      const carElement = document.querySelector('.car');
+      
+      if (e.key === 'ArrowLeft') {
+        carSpeed = -2; // Move left
+        carElement?.classList.add('turning-left');
+        carElement?.classList.remove('turning-right');
+      } else if (e.key === 'ArrowRight') {
+        carSpeed = 2; // Move right
+        carElement?.classList.add('turning-right');
+        carElement?.classList.remove('turning-left');
+      } else if (e.key === 'ArrowUp') {
+        // Boost speed
+        roadSpeed = Math.min(roadSpeed + 1, 15);
+        const road = document.querySelector('.road');
+        if (road) {
+          road.style.animation = `roadLineAnimation ${0.5 - roadSpeed * 0.02}s linear infinite`;
+        }
+      } else if (e.key === 'ArrowDown') {
+        // Slow down
+        roadSpeed = Math.max(roadSpeed - 1, 3);
+        const road = document.querySelector('.road');
+        if (road) {
+          road.style.animation = `roadLineAnimation ${0.5 - roadSpeed * 0.02}s linear infinite`;
+        }
+      } else if (e.key === 'Escape') {
+        // Exit game with Escape key
+        disableRacingGame();
+      }
+    }
+
+    function createObstacle() {
+      const obstacleTypes = ['car', 'truck', 'cone', 'puddle'];
+      const type = obstacleTypes[Math.floor(Math.random() * obstacleTypes.length)];
+
+      const obstacle = {
+        x: Math.random() * 80 + 10,
+        y: -10,
+        width: type === 'truck' ? 15 : (type === 'car' ? 10 : (type === 'puddle' ? 20 : 5)),
+        height: type === 'truck' ? 20 : (type === 'car' ? 15 : (type === 'puddle' ? 8 : 5)),
+        type: type
+      };
+      obstacles.push(obstacle);
+
+      const obstacleElement = document.createElement('div');
+      obstacleElement.className = `obstacle obstacle-${type}`;
+      obstacleElement.style.left = `${obstacle.x}%`;
+      obstacleElement.style.top = `${obstacle.y}%`;
+      obstacleElement.style.width = `${obstacle.width}%`;
+      obstacleElement.style.height = `${obstacle.height}%`;
+
+      const gameOverlay = document.querySelector('.game-overlay');
+      if (gameOverlay) {
+        gameOverlay.appendChild(obstacleElement);
+      }
+    }
+    
+    function moveObstacles() {
+      obstacles.forEach((obstacle, index) => {
+        obstacle.y += roadSpeed;
+        
+        if (obstacle.y > 110) {
+          const obstacleElements = document.querySelectorAll('.obstacle');
+          if (obstacleElements[index]) {
+            obstacleElements[index].remove();
+          }
+          obstacles.splice(index, 1);
+        }
+      });
+    }
+
+    function checkCollisions() {
+      const carElement = document.querySelector('.car');
+      if (!carElement) return;
+
+      const carRect = {
+        x: carPosition,
+        y: 80,
+        width: 10,
+        height: 15
+      };
+
+      obstacles.forEach(obstacle => {
+        if (isColliding(carRect, obstacle)) {
+          // Game over
+          showGameOver();
+        }
+      });
+    }
+    
+    function showGameOver() {
+      // Stop the game loop but keep the game visible
+      if (gameLoopInterval) {
+        clearInterval(gameLoopInterval);
+        gameLoopInterval = null;
+      }
+      
+      // Create game over overlay
+      const gameOverlay = document.querySelector('.game-overlay');
+      if (gameOverlay) {
+        const gameOverElement = document.createElement('div');
+        gameOverElement.className = 'game-over';
+        gameOverElement.innerHTML = `
+          <h1>GAME OVER</h1>
+          <p>Your score: ${gameScore}</p>
+          <div class="game-over-options">
+            <button id="restart-game">Play Again</button>
+            <button id="exit-game">Exit</button>
+          </div>
+        `;
+        gameOverlay.appendChild(gameOverElement);
+        
+        // Add event listeners to buttons
+        const restartButton = document.getElementById('restart-game');
+        if (restartButton) {
+          restartButton.addEventListener('click', () => {
+            // Remove the game over screen
+            if (gameOverElement.parentNode) {
+              gameOverElement.parentNode.removeChild(gameOverElement);
+            }
+            // Reset the game
+            resetGame();
+          });
+        }
+        
+        const exitButton = document.getElementById('exit-game');
+        if (exitButton) {
+          exitButton.addEventListener('click', () => {
+            disableRacingGame();
+          });
+        }
+      }
+    }
+    
+    function resetGame() {
+      // Reset game variables
+      carPosition = 50;
+      carSpeed = 0;
+      roadSpeed = 5;
+      gameScore = 0;
+
+      // Clear obstacles
+      obstacles = [];
+      const obstacleElements = document.querySelectorAll('.obstacle');
+      obstacleElements.forEach(element => {
+        if (element.parentNode) {
+          element.parentNode.removeChild(element);
+        }
+      });
+
+      // Update score display
+      const scoreElement = document.querySelector('.score');
+      if (scoreElement) {
+        scoreElement.textContent = 'SCORE: 0';
+      }
+
+      // Reset car position
+      const carElement = document.querySelector('.car');
+      if (carElement) {
+        carElement.setAttribute('style', 'left: 50%;');
+        carElement.classList.remove('turning-left', 'turning-right');
+      }
+
+      // Start game loop again
+      startGameLoop();
+    }
+
+    function isColliding(rect1: any, rect2: any) {
+      return (
+        rect1.x < rect2.x + rect2.width &&
+        rect1.x + rect1.width > rect2.x &&
+        rect1.y < rect2.y + rect2.height &&
+        rect1.y + rect1.height > rect2.y
+      );
+    }
+
+    function updateGameVisuals() {
+      const carElement = document.querySelector('.car');
+      if (carElement) {
+        carElement.setAttribute('style', `left: ${carPosition}%;`);
+      }
+
+      const obstacleElements = document.querySelectorAll('.obstacle');
+      obstacles.forEach((obstacle, index) => {
+        if (obstacleElements[index]) {
+          obstacleElements[index].style.top = `${obstacle.y}%`;
+        }
+      });
+    }
+    
     // Load dark mode preference from localStorage if available
-    const savedDarkLevel = localStorage.getItem('darkLevel');
-    if (savedDarkLevel) {
-      document.body.style.setProperty('--dark-level', savedDarkLevel);
-      if (darkModeSlider) darkModeSlider.value = savedDarkLevel;
+    const savedDarkMode = localStorage.getItem('darkMode');
+    if (savedDarkMode) {
+      const isDarkMode = savedDarkMode === 'true';
+      document.body.style.setProperty('--dark-level', isDarkMode ? '1' : '0');
+      if (darkModeToggle) darkModeToggle.checked = isDarkMode;
     }
   });
 </script>
@@ -227,53 +612,106 @@ const navLinks = [
     font-size: 1.2rem;
   }
 
-  .dark-mode-slider-container {
+  .dark-mode-toggle-container {
     position: relative;
-    width: 80px;
-    height: 24px;
+    width: 60px;
+    height: 30px;
   }
 
-  .slider-track {
+  .dark-mode-toggle {
     position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+
+  .toggle-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
     left: 0;
     right: 0;
-    height: 8px;
-    background: linear-gradient(to right, #f8f9fa, #212529);
-    border-radius: 4px;
-    z-index: 1;
+    bottom: 0;
+    background: var(--bg-secondary);
+    transition: 0.4s;
+    border-radius: 30px;
+    border: 1px solid var(--border-color);
   }
 
-  #darkModeSlider {
-    position: relative;
-    -webkit-appearance: none;
-    width: 100%;
-    height: 24px;
-    background: transparent;
-    cursor: pointer;
-    z-index: 2;
-  }
-
-  #darkModeSlider::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    width: 24px;
-    height: 24px;
-    background: var(--accent-primary);
+  .toggle-slider:before {
+    position: absolute;
+    content: "";
+    height: 26px;
+    width: 26px;
+    left: 2px;
+    bottom: 2px;
+    background-color: var(--accent-primary);
+    transition: 0.4s;
     border-radius: 50%;
-    cursor: pointer;
-    border: 3px solid white;
-    box-shadow: 0 0 3px rgba(0, 0, 0, 0.2);
+    border: 2px solid white;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   }
 
-  #darkModeSlider::-moz-range-thumb {
-    width: 24px;
-    height: 24px;
-    background: var(--accent-primary);
-    border-radius: 50%;
-    cursor: pointer;
-    border: 3px solid white;
-    box-shadow: 0 0 3px rgba(0, 0, 0, 0.2);
+  .dark-mode-toggle:checked + .toggle-slider {
+    background: var(--text-primary);
+  }
+
+  .dark-mode-toggle:checked + .toggle-slider:before {
+    transform: translateX(30px);
+  }
+  
+  /* Rage Mode Styles */
+  body.rage-mode {
+    animation: flashRainbow 0.2s infinite;
+  }
+  
+  body.rage-mode * {
+    animation: textColorFlash 0.3s infinite alternate;
+  }
+  
+  body.rage-mode .toggle-slider {
+    background: linear-gradient(
+      90deg, 
+      hsl(calc(var(--rainbow-hue) + 0), 100%, 50%) 0%,
+      hsl(calc(var(--rainbow-hue) + 60), 100%, 50%) 20%,
+      hsl(calc(var(--rainbow-hue) + 120), 100%, 50%) 40%,
+      hsl(calc(var(--rainbow-hue) + 180), 100%, 50%) 60%,
+      hsl(calc(var(--rainbow-hue) + 240), 100%, 50%) 80%,
+      hsl(calc(var(--rainbow-hue) + 300), 100%, 50%) 100%
+    );
+    animation: pulseBorder 0.3s infinite alternate;
+    border-width: 2px;
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+  }
+  
+  body.rage-mode .toggle-slider:before {
+    animation: spin 0.5s linear infinite;
+    background: white;
+    border-color: hsl(var(--rainbow-hue), 100%, 50%);
+    border-width: 3px;
+  }
+  
+  @keyframes flashRainbow {
+    0% { background-color: hsla(calc(var(--rainbow-hue) + 0), 100%, 50%, 0.3); }
+    33% { background-color: hsla(calc(var(--rainbow-hue) + 120), 100%, 50%, 0.3); }
+    66% { background-color: hsla(calc(var(--rainbow-hue) + 240), 100%, 50%, 0.3); }
+    100% { background-color: hsla(calc(var(--rainbow-hue) + 360), 100%, 50%, 0.3); }
+  }
+  
+  @keyframes textColorFlash {
+    0% { color: hsl(calc(var(--rainbow-hue) + 60), 100%, 50%); }
+    50% { color: hsl(calc(var(--rainbow-hue) + 180), 100%, 50%); }
+    100% { color: hsl(calc(var(--rainbow-hue) + 300), 100%, 50%); }
+  }
+  
+  @keyframes pulseBorder {
+    from { box-shadow: 0 0 5px hsla(var(--rainbow-hue), 100%, 50%, 0.8); }
+    to { box-shadow: 0 0 15px hsla(var(--rainbow-hue), 100%, 50%, 1); }
+  }
+  
+  @keyframes spin {
+    from { transform: rotate(0deg) translateX(var(--translate-x, 0)); }
+    to { transform: rotate(360deg) translateX(var(--translate-x, 0)); }
   }
 
   /* Mobile Navigation Toggle */
@@ -344,12 +782,28 @@ const navLinks = [
     }
   }
 
+  /* Game Over Styles */
+  .game-over {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: rgba(255, 255, 255, 0.9);
+    padding: 2rem;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+    z-index: 9999;
+  }
+
+  .game-over-options button {
+    margin: 0.5rem;
+  }
+
   .navbar.floating .nav-links a,
   .navbar.floating .logo a,
   .navbar.floating .dark-mode-icon {
     color: white;
   }
-  
+
   .navbar.floating .mobile-nav-toggle .bar {
     background-color: white;
   }
@@ -369,11 +823,19 @@ const navLinks = [
     background: linear-gradient(to right, rgba(255,255,255,0.3), rgba(255,255,255,0.8));
   }
 
-  .navbar.floating #darkModeSlider::-webkit-slider-thumb {
+  .navbar.floating .nav-links a {
+    color: white;
+  }
+
+  .navbar.floating .toggle-slider {
+    background: linear-gradient(to right, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0.3) 50%, rgba(255,255,255,0.8) 50%, rgba(255,255,255,0.8) 100%);
+  }
+
+  .navbar.floating .toggle-slider:before {
     border-color: rgba(0, 0, 0, 0.8);
   }
 
-  .navbar.floating #darkModeSlider::-moz-range-thumb {
-    border-color: rgba(0, 0, 0, 0.8);
+  .navbar.floating .dark-mode-toggle:checked + .toggle-slider {
+    background: linear-gradient(to right, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0.8) 100%);
   }
 </style>

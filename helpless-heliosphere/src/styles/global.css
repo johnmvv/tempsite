@@ -285,3 +285,323 @@ section {
     grid-template-columns: repeat(4, 1fr);
   }
 }
+
+/* Rage Mode Global Effects */
+body.rage-mode {
+  overflow-x: hidden;
+}
+
+body.rage-mode::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 9999;
+  pointer-events: none;
+  mix-blend-mode: overlay;
+  animation: fullscreenRainbowFlash 0.15s infinite alternate;
+}
+
+body.rage-mode .container,
+body.rage-mode section,
+body.rage-mode .card,
+body.rage-mode .btn {
+  animation: borderPulse 0.3s infinite alternate;
+}
+
+body.rage-mode img,
+body.rage-mode .logo-dot,
+body.rage-mode .skill-icon,
+body.rage-mode .interest-icon {
+  animation: spinAndHue 2s linear infinite;
+}
+
+body.rage-mode h1,
+body.rage-mode h2,
+body.rage-mode h3 {
+  animation: shakeText 0.1s infinite;
+}
+
+@keyframes fullscreenRainbowFlash {
+  0% { background-color: hsla(calc(var(--rainbow-hue) + 0), 100%, 50%, 0.3); }
+  25% { background-color: hsla(calc(var(--rainbow-hue) + 90), 100%, 50%, 0.3); }
+  50% { background-color: hsla(calc(var(--rainbow-hue) + 180), 100%, 50%, 0.3); }
+  75% { background-color: hsla(calc(var(--rainbow-hue) + 270), 100%, 50%, 0.3); }
+  100% { background-color: hsla(calc(var(--rainbow-hue) + 360), 100%, 50%, 0.3); }
+}
+
+@keyframes borderPulse {
+  from { box-shadow: 0 0 10px hsla(calc(var(--rainbow-hue)), 100%, 50%, 0.7); }
+  to { box-shadow: 0 0 25px hsla(calc(var(--rainbow-hue) + 180), 100%, 50%, 0.9); }
+}
+
+@keyframes spinAndHue {
+  from { 
+    filter: hue-rotate(0deg); 
+    transform: rotate(0deg);
+  }
+  to { 
+    filter: hue-rotate(360deg);
+    transform: rotate(360deg); 
+  }
+}
+
+@keyframes shakeText {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-2px); }
+  75% { transform: translateX(2px); }
+}
+
+/* Racing Game Styles */
+#racing-game {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 9999;
+  background-color: #111;
+  perspective: 1000px;
+  overflow: hidden;
+}
+
+.game-overlay {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  perspective: 1000px;
+}
+
+.road {
+  position: relative;
+  width: 70%;
+  height: 100%;
+  background-color: #333;
+  transform: rotateX(60deg);
+  background: linear-gradient(
+    to bottom,
+    #333, #555
+  );
+  overflow: hidden;
+  box-shadow: 0 0 50px rgba(0, 0, 0, 0.8);
+  border-left: 10px solid #f9d71c;
+  border-right: 10px solid #f9d71c;
+}
+
+.road:before, .road:after {
+  content: "";
+  position: absolute;
+  top: 0;
+  width: 10px;
+  height: 100%;
+  background: repeating-linear-gradient(
+    to bottom,
+    #f9d71c 0px, 
+    #f9d71c 50px,
+    transparent 50px,
+    transparent 100px
+  );
+  animation: roadLineAnimation 0.5s linear infinite;
+}
+
+.road:before {
+  left: -10px;
+}
+
+.road:after {
+  right: -10px;
+}
+
+.road-line {
+  position: absolute;
+  left: 50%;
+  width: 10px;
+  height: 50px;
+  margin-left: -5px;
+  background-color: white;
+  transform: translateZ(0);
+}
+
+.road-line:nth-child(1) {
+  top: 0%;
+  animation: roadLineAnimation 0.5s linear infinite;
+}
+.road-line:nth-child(2) {
+  top: 20%;
+  animation: roadLineAnimation 0.5s 0.1s linear infinite;
+}
+.road-line:nth-child(3) {
+  top: 40%;
+  animation: roadLineAnimation 0.5s 0.2s linear infinite;
+}
+.road-line:nth-child(4) {
+  top: 60%;
+  animation: roadLineAnimation 0.5s 0.3s linear infinite;
+}
+.road-line:nth-child(5) {
+  top: 80%;
+  animation: roadLineAnimation 0.5s 0.4s linear infinite;
+}
+
+@keyframes roadLineAnimation {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(100px); }
+}
+
+.car {
+  position: absolute;
+  bottom: 10%;
+  width: 60px;
+  height: 100px;
+  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 100"><rect x="10" y="10" width="40" height="80" rx="10" fill="%23f00"/><rect x="15" y="20" width="30" height="20" rx="5" fill="%23fff"/><rect x="15" y="60" width="30" height="20" rx="5" fill="%23000"/><rect x="5" y="30" width="5" height="40" rx="2" fill="%23000"/><rect x="50" y="30" width="5" height="40" rx="2" fill="%23000"/></svg>');
+  background-size: contain;
+  background-repeat: no-repeat;
+  transform-origin: bottom center;
+  z-index: 10;
+  transition: transform 0.1s ease;
+}
+
+.car.turning-left {
+  transform: rotate(-5deg);
+}
+
+.car.turning-right {
+  transform: rotate(5deg);
+}
+
+/* Obstacle styles for different types */
+.obstacle {
+  position: absolute;
+  border-radius: 5px;
+  z-index: 5;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+  transform: rotateX(60deg);
+}
+
+.obstacle-car {
+  background-color: #3498db;
+  border: 2px solid #2980b9;
+  box-shadow: 0 0 10px rgba(52, 152, 219, 0.7);
+  border-radius: 5px;
+}
+
+.obstacle-truck {
+  background-color: #e74c3c;
+  border: 2px solid #c0392b;
+  box-shadow: 0 0 10px rgba(231, 76, 60, 0.7);
+  border-radius: 8px;
+}
+
+.obstacle-cone {
+  background-color: #f39c12;
+  border: 2px solid #e67e22;
+  box-shadow: 0 0 10px rgba(243, 156, 18, 0.7);
+  clip-path: polygon(50% 0%, 100% 100%, 0% 100%);
+  border-radius: 0;
+}
+
+.obstacle-puddle {
+  background-color: rgba(52, 152, 219, 0.4);
+  border: 1px solid rgba(52, 152, 219, 0.8);
+  border-radius: 50%;
+  box-shadow: 0 0 15px rgba(52, 152, 219, 0.5);
+}
+
+.score {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 24px;
+  color: #fff;
+  text-shadow: 0 0 5px #f00, 0 0 10px #f00;
+  z-index: 20;
+}
+
+.game-message {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: monospace;
+  font-size: 18px;
+  color: #fff;
+  background-color: rgba(0,0,0,0.7);
+  padding: 10px 20px;
+  border-radius: 10px;
+  text-align: center;
+  animation: pulse 1.5s infinite;
+}
+
+/* Game Over Screen Styles */
+.game-over {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: rgba(0, 0, 0, 0.85);
+  border: 3px solid #ff0000;
+  border-radius: 15px;
+  padding: 2.5rem;
+  text-align: center;
+  color: white;
+  z-index: 100;
+  min-width: 300px;
+  box-shadow: 0 0 50px rgba(255, 0, 0, 0.5);
+  animation: pulsate 1.5s infinite alternate;
+}
+
+.game-over h1 {
+  font-size: 3rem;
+  font-family: 'Press Start 2P', monospace;
+  margin-bottom: 1.5rem;
+  color: #ff0000;
+  text-shadow: 0 0 10px rgba(255, 0, 0, 0.7);
+  letter-spacing: 2px;
+}
+
+.game-over p {
+  font-size: 1.5rem;
+  margin-bottom: 2rem;
+  color: #fff;
+}
+
+.game-over-options {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.game-over-options button {
+  background-color: #ff0000;
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  font-weight: bold;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.game-over-options button:hover {
+  transform: scale(1.1);
+  box-shadow: 0 0 20px rgba(255, 0, 0, 0.8);
+}
+
+.game-over-options button#exit-game {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+@keyframes pulsate {
+  from { box-shadow: 0 0 20px rgba(255, 0, 0, 0.5); }
+  to { box-shadow: 0 0 40px rgba(255, 0, 0, 0.8); }
+}

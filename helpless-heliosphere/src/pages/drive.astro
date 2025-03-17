@@ -1,0 +1,633 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout title="Drive Simulator" activeLink="/drive">
+  <div class="simulator-page">
+    <div class="simulator-container">
+      <canvas id="drivingCanvas"></canvas>
+      <div class="controls-overlay">
+        <div class="speedometer">
+          <span class="speed-value">0</span>
+          <span class="speed-unit">km/h</span>
+        </div>
+        <div class="lap-counter">
+          <span class="lap-label">Lap:</span>
+          <span class="lap-value">0/3</span>
+        </div>
+        <div class="timer">00:00:000</div>
+      </div>
+      <div class="instructions">
+        <h3>Controls:</h3>
+        <p>Arrow Up: Accelerate</p>
+        <p>Arrow Down: Brake</p>
+        <p>Arrow Left/Right: Steer</p>
+        <p>R: Reset</p>
+        <p>Space: Handbrake</p>
+      </div>
+    </div>
+  </div>
+</Layout>
+
+<script>
+  // Wait for DOM to load
+  document.addEventListener('DOMContentLoaded', () => {
+    // Get the canvas element and its context
+    const canvas = document.getElementById('drivingCanvas') as HTMLCanvasElement;
+    const ctx = canvas.getContext('2d');
+    
+    // Set canvas to fullscreen
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    
+    // Initial resize and add event listener for window resize
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
+    
+    // Constants and variables for the simulation
+    const CAR_LENGTH = 20;
+    const CAR_WIDTH = 10;
+    const CAMERA_HEIGHT = 50;
+    const TRACK_WIDTH = 200;
+    
+    // Car state
+    let carX = 0; // Position X (center of track)
+    let carY = 0; // Position Y (start position)
+    let carSpeed = 0; // Current speed
+    let carAngle = 0; // Current angle in radians
+    let steeringAngle = 0; // Current steering angle
+    
+    // Track definition - an array of points that define the center of the track
+    // Each point is [x, y]
+    const trackPoints = [
+      [0, 0],
+      [0, -500],
+      [300, -800],
+      [600, -700],
+      [800, -300],
+      [700, 200],
+      [300, 300],
+      [0, 0]  // Complete the loop
+    ];
+    
+    // Game state
+    let currentLap = 0;
+    let maxLaps = 3;
+    let raceStarted = false;
+    let raceFinished = false;
+    let startTime = 0;
+    let currentTime = 0;
+    let bestTime = Infinity;
+    let lastCheckpoint = -1; // Used to prevent lap cheating
+    
+    // Controls state
+    const keys = {
+      ArrowUp: false,
+      ArrowDown: false,
+      ArrowLeft: false,
+      ArrowRight: false,
+      Space: false,
+      KeyR: false
+    };
+    
+    // Event listeners for keyboard controls
+    window.addEventListener('keydown', (e) => {
+      if (keys.hasOwnProperty(e.code)) {
+        keys[e.code] = true;
+        
+        // Start the race timer on first input
+        if (!raceStarted && !raceFinished) {
+          raceStarted = true;
+          startTime = Date.now();
+        }
+      }
+    });
+    
+    window.addEventListener('keyup', (e) => {
+      if (keys.hasOwnProperty(e.code)) {
+        keys[e.code] = false;
+        
+        // Reset the simulation if R is pressed
+        if (e.code === 'KeyR') {
+          resetRace();
+        }
+      }
+    });
+    
+    // Reset the race
+    function resetRace() {
+      carX = 0;
+      carY = 0;
+      carSpeed = 0;
+      carAngle = 0;
+      steeringAngle = 0;
+      currentLap = 0;
+      raceStarted = false;
+      raceFinished = false;
+      lastCheckpoint = -1;
+      updateLapCounter();
+      updateTimer(0);
+    }
+    
+    // Update the UI for lap counter
+    function updateLapCounter() {
+      const lapCounter = document.querySelector('.lap-value');
+      if (lapCounter) {
+        lapCounter.textContent = `${currentLap}/${maxLaps}`;
+      }
+    }
+    
+    // Update the UI for speed
+    function updateSpeedometer(speed) {
+      const speedValue = document.querySelector('.speed-value');
+      if (speedValue) {
+        // Convert to km/h for display
+        speedValue.textContent = Math.abs(Math.round(speed * 3.6));
+      }
+    }
+    
+    // Format timer display (mm:ss:ms)
+    function formatTime(ms) {
+      const minutes = Math.floor(ms / 60000);
+      const seconds = Math.floor((ms % 60000) / 1000);
+      const milliseconds = ms % 1000;
+      
+      return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}:${milliseconds.toString().padStart(3, '0')}`;
+    }
+    
+    // Update the UI for timer
+    function updateTimer(time) {
+      const timerElement = document.querySelector('.timer');
+      if (timerElement) {
+        timerElement.textContent = formatTime(time);
+      }
+    }
+    
+    // Check if car is near a checkpoint to count laps
+    function checkLapProgress() {
+      // Calculate distance to start/finish line
+      const distanceToStart = Math.sqrt(carX * carX + carY * carY);
+      
+      // If we're near the start/finish and coming from the last checkpoint
+      if (distanceToStart < 50 && lastCheckpoint === trackPoints.length - 2) {
+        if (raceStarted && !raceFinished) {
+          currentLap++;
+          updateLapCounter();
+          
+          // Check if race is complete
+          if (currentLap >= maxLaps) {
+            raceFinished = true;
+            const finalTime = Date.now() - startTime;
+            
+            // Update best time
+            if (finalTime < bestTime) {
+              bestTime = finalTime;
+            }
+            
+            // Show race completion message
+            setTimeout(() => {
+              alert(`Race complete!\nTime: ${formatTime(finalTime)}\nBest time: ${formatTime(bestTime)}`);
+            }, 100);
+          }
+        }
+        
+        lastCheckpoint = 0;
+      }
+      
+      // Check other checkpoints
+      for (let i = 0; i < trackPoints.length - 1; i++) {
+        const point = trackPoints[i];
+        const distanceToPoint = Math.sqrt(
+          Math.pow(carX - point[0], 2) + 
+          Math.pow(carY - point[1], 2)
+        );
+        
+        // If we're near a checkpoint and it's the next one in sequence
+        if (distanceToPoint < 50 && lastCheckpoint === i - 1) {
+          lastCheckpoint = i;
+          break;
+        }
+      }
+    }
+    
+    // Calculate point on track for a given segment and percentage
+    function getTrackPoint(segmentIndex, t) {
+      const p1 = trackPoints[segmentIndex];
+      const p2 = trackPoints[(segmentIndex + 1) % trackPoints.length];
+      
+      return [
+        p1[0] * (1 - t) + p2[0] * t,
+        p1[1] * (1 - t) + p2[1] * t
+      ];
+    }
+    
+    // Find the closest point on the track to the car
+    function findClosestTrackPoint() {
+      let closestDist = Infinity;
+      let closestSegment = 0;
+      let closestT = 0;
+      
+      // Check each segment of the track
+      for (let i = 0; i < trackPoints.length - 1; i++) {
+        const p1 = trackPoints[i];
+        const p2 = trackPoints[i + 1];
+        
+        // Vector from p1 to p2
+        const segmentVector = [p2[0] - p1[0], p2[1] - p1[1]];
+        const segmentLength = Math.sqrt(segmentVector[0] * segmentVector[0] + segmentVector[1] * segmentVector[1]);
+        
+        // Vector from p1 to car
+        const carVector = [carX - p1[0], carY - p1[1]];
+        
+        // Project car onto segment
+        let dotProduct = (carVector[0] * segmentVector[0] + carVector[1] * segmentVector[1]) / (segmentLength * segmentLength);
+        dotProduct = Math.max(0, Math.min(1, dotProduct)); // Clamp to [0, 1]
+        
+        // Calculate closest point on segment
+        const closestPoint = [
+          p1[0] + dotProduct * segmentVector[0],
+          p1[1] + dotProduct * segmentVector[1]
+        ];
+        
+        // Calculate distance to this point
+        const distance = Math.sqrt(
+          Math.pow(carX - closestPoint[0], 2) + 
+          Math.pow(carY - closestPoint[1], 2)
+        );
+        
+        if (distance < closestDist) {
+          closestDist = distance;
+          closestSegment = i;
+          closestT = dotProduct;
+        }
+      }
+      
+      return { segment: closestSegment, t: closestT, distance: closestDist };
+    }
+    
+    // Draw the 3D wireframe track from the car's perspective
+    function draw3DTrack() {
+      if (!ctx) return;
+      
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      
+      // Set drawing styles
+      ctx.lineWidth = 2;
+      ctx.strokeStyle = 'rgb(0, 255, 0)';
+      
+      // Calculate the car's perspective
+      const centerX = canvas.width / 2;
+      const centerY = canvas.height / 2;
+      const horizonY = centerY - 100;
+      
+      // Find the current position on the track
+      const trackPosition = findClosestTrackPoint();
+      
+      // Draw track segments in 3D perspective
+      const segments = 100; // Number of segments to render
+      const segmentLength = 20; // Length of each segment
+      
+      // Start from current position and draw forward
+      let currentSegment = trackPosition.segment;
+      let currentT = trackPosition.t;
+      
+      // Create points for left and right edges
+      let points = [];
+      
+      for (let i = 0; i < segments; i++) {
+        // Get center point on track
+        const centerPoint = getTrackPoint(currentSegment, currentT);
+        
+        // Calculate track direction
+        const nextT = currentT + 0.01;
+        if (nextT >= 1) {
+          currentSegment = (currentSegment + 1) % (trackPoints.length - 1);
+          currentT = 0;
+        } else {
+          currentT = nextT;
+        }
+        
+        const nextPoint = getTrackPoint(currentSegment, currentT);
+        const dirX = nextPoint[0] - centerPoint[0];
+        const dirY = nextPoint[1] - centerPoint[1];
+        const dirLength = Math.sqrt(dirX * dirX + dirY * dirY);
+        
+        // Normalize direction
+        const normDirX = dirX / dirLength;
+        const normDirY = dirY / dirLength;
+        
+        // Calculate perpendicular vector (90 degrees to direction)
+        const perpX = -normDirY;
+        const perpY = normDirX;
+        
+        // Calculate left and right edge points
+        const leftEdge = [
+          centerPoint[0] - perpX * (TRACK_WIDTH / 2),
+          centerPoint[1] - perpY * (TRACK_WIDTH / 2)
+        ];
+        
+        const rightEdge = [
+          centerPoint[0] + perpX * (TRACK_WIDTH / 2),
+          centerPoint[1] + perpY * (TRACK_WIDTH / 2)
+        ];
+        
+        // Transform to car's perspective
+        const relLeftX = leftEdge[0] - carX;
+        const relLeftY = leftEdge[1] - carY;
+        const relRightX = rightEdge[0] - carX;
+        const relRightY = rightEdge[1] - carY;
+        
+        // Rotate based on car angle
+        const cosAngle = Math.cos(-carAngle);
+        const sinAngle = Math.sin(-carAngle);
+        
+        const rotLeftX = relLeftX * cosAngle - relLeftY * sinAngle;
+        const rotLeftY = relLeftX * sinAngle + relLeftY * cosAngle;
+        const rotRightX = relRightX * cosAngle - relRightY * sinAngle;
+        const rotRightY = relRightX * sinAngle + relRightY * cosAngle;
+        
+        // Apply perspective projection
+        let depth = rotLeftY;
+        const scale = CAMERA_HEIGHT / (depth + CAMERA_HEIGHT);
+        const projLeftX = centerX + rotLeftX * scale;
+        const projLeftY = centerY - scale * 100;
+        
+        depth = rotRightY;
+        const scaleRight = CAMERA_HEIGHT / (depth + CAMERA_HEIGHT);
+        const projRightX = centerX + rotRightX * scaleRight;
+        const projRightY = centerY - scaleRight * 100;
+        
+        // Add points to array
+        if (rotLeftY > 0 && rotRightY > 0) {
+          points.push({
+            leftX: projLeftX,
+            leftY: projLeftY,
+            rightX: projRightX,
+            rightY: projRightY,
+            dist: (rotLeftY + rotRightY) / 2
+          });
+        }
+        
+        // Move to next segment
+        currentT += 0.1;
+        if (currentT >= 1) {
+          currentSegment = (currentSegment + 1) % (trackPoints.length - 1);
+          currentT = 0;
+        }
+      }
+      
+      // Sort points by distance (farthest to nearest)
+      points.sort((a, b) => b.dist - a.dist);
+      
+      // Draw track segments
+      ctx.beginPath();
+      
+      for (let i = 0; i < points.length - 1; i++) {
+        const p1 = points[i];
+        const p2 = points[i + 1];
+        
+        // Calculate alpha based on distance
+        const alpha1 = Math.min(1, Math.max(0, 1 - (i / points.length)));
+        const alpha2 = Math.min(1, Math.max(0, 1 - ((i + 1) / points.length)));
+        
+        // Draw track edges
+        ctx.strokeStyle = `rgba(0, 255, 0, ${alpha1})`;
+        ctx.beginPath();
+        ctx.moveTo(p1.leftX, p1.leftY);
+        ctx.lineTo(p2.leftX, p2.leftY);
+        ctx.stroke();
+        
+        ctx.beginPath();
+        ctx.moveTo(p1.rightX, p1.rightY);
+        ctx.lineTo(p2.rightX, p2.rightY);
+        ctx.stroke();
+        
+        // Draw track surface lines
+        ctx.strokeStyle = `rgba(0, 255, 0, ${alpha1 * 0.5})`;
+        ctx.beginPath();
+        ctx.moveTo(p1.leftX, p1.leftY);
+        ctx.lineTo(p1.rightX, p1.rightY);
+        ctx.stroke();
+      }
+      
+      // Draw horizon line
+      ctx.strokeStyle = 'rgb(0, 255, 0)';
+      ctx.beginPath();
+      ctx.moveTo(0, horizonY);
+      ctx.lineTo(canvas.width, horizonY);
+      ctx.stroke();
+      
+      // Draw car
+      ctx.fillStyle = 'rgb(0, 255, 0)';
+      ctx.beginPath();
+      ctx.moveTo(centerX - CAR_WIDTH/2, centerY + 100);
+      ctx.lineTo(centerX + CAR_WIDTH/2, centerY + 100);
+      ctx.lineTo(centerX + CAR_WIDTH/2, centerY + 100 - CAR_LENGTH);
+      ctx.lineTo(centerX - CAR_WIDTH/2, centerY + 100 - CAR_LENGTH);
+      ctx.closePath();
+      ctx.fill();
+      
+      // Draw steering indicator
+      const steeringIndicatorX = centerX + (steeringAngle * 50);
+      ctx.beginPath();
+      ctx.arc(steeringIndicatorX, centerY + 120, 5, 0, Math.PI * 2);
+      ctx.fill();
+      
+      // Draw center line for steering
+      ctx.strokeStyle = 'rgba(0, 255, 0, 0.5)';
+      ctx.beginPath();
+      ctx.moveTo(centerX - 50, centerY + 120);
+      ctx.lineTo(centerX + 50, centerY + 120);
+      ctx.stroke();
+    }
+    
+    // Physics update function
+    function updatePhysics(deltaTime) {
+      // Convert deltaTime to seconds for physics calculations
+      const dt = deltaTime / 1000;
+      
+      // Handle controls
+      const acceleration = 200; // Units per second squared
+      const brakeStrength = 300;
+      const drag = 0.95; // Air resistance
+      const turnSpeed = 2; // Radians per second
+      const maxSpeed = 300; // Maximum speed
+      
+      // Accelerate/decelerate
+      if (keys.ArrowUp) {
+        carSpeed += acceleration * dt;
+      }
+      
+      if (keys.ArrowDown) {
+        // If moving forward, apply brakes, otherwise reverse
+        if (carSpeed > 0) {
+          carSpeed -= brakeStrength * dt;
+        } else {
+          carSpeed -= acceleration * dt * 0.5; // Reverse is slower
+        }
+      }
+      
+      // Apply drag
+      carSpeed *= Math.pow(drag, dt * 60);
+      
+      // Limit speed
+      carSpeed = Math.max(-maxSpeed/2, Math.min(maxSpeed, carSpeed));
+      
+      // Steering
+      steeringAngle = 0;
+      if (keys.ArrowLeft) {
+        steeringAngle = -1;
+      } else if (keys.ArrowRight) {
+        steeringAngle = 1;
+      }
+      
+      // Apply steering (more effective at higher speeds)
+      const steeringFactor = Math.min(1, Math.abs(carSpeed) / 50);
+      carAngle += steeringAngle * turnSpeed * dt * steeringFactor * Math.sign(carSpeed);
+      
+      // Handbrake (drift)
+      if (keys.Space && Math.abs(carSpeed) > 50) {
+        carAngle += steeringAngle * turnSpeed * dt * 2 * Math.sign(carSpeed);
+        carSpeed *= 0.98; // Slow down while drifting
+      }
+      
+      // Update position
+      carX += Math.sin(carAngle) * carSpeed * dt;
+      carY += -Math.cos(carAngle) * carSpeed * dt;
+      
+      // Check lap progress
+      checkLapProgress();
+      
+      // Update UI
+      updateSpeedometer(carSpeed);
+      
+      // Update timer if race is in progress
+      if (raceStarted && !raceFinished) {
+        const elapsed = Date.now() - startTime;
+        updateTimer(elapsed);
+      }
+    }
+    
+    // Game loop
+    let lastTime = 0;
+    function gameLoop(timestamp) {
+      // Calculate delta time
+      const deltaTime = lastTime ? timestamp - lastTime : 0;
+      lastTime = timestamp;
+      
+      // Update physics
+      updatePhysics(deltaTime);
+      
+      // Render the scene
+      draw3DTrack();
+      
+      // Continue the loop
+      window.requestAnimationFrame(gameLoop);
+    }
+    
+    // Start the game loop
+    window.requestAnimationFrame(gameLoop);
+    resetRace();
+  });
+</script>
+
+<style>
+  .simulator-page {
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    background-color: black;
+    overflow: hidden;
+  }
+  
+  .simulator-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  #drivingCanvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+  }
+  
+  .controls-overlay {
+    position: absolute;
+    bottom: 2rem;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    justify-content: center;
+    gap: 3rem;
+    color: #0f0;
+    font-family: 'Inter', monospace;
+    font-size: 1.5rem;
+    text-shadow: 0 0 10px rgba(0, 255, 0, 0.7);
+    z-index: 10;
+  }
+  
+  .speedometer {
+    display: flex;
+    align-items: baseline;
+  }
+  
+  .speed-value {
+    font-size: 3rem;
+    font-weight: bold;
+  }
+  
+  .speed-unit {
+    margin-left: 0.5rem;
+    opacity: 0.7;
+  }
+  
+  .lap-counter {
+    display: flex;
+    align-items: baseline;
+  }
+  
+  .lap-label {
+    margin-right: 0.5rem;
+    opacity: 0.7;
+  }
+  
+  .lap-value {
+    font-size: 2rem;
+    font-weight: bold;
+  }
+  
+  .timer {
+    font-family: monospace;
+    font-size: 2rem;
+  }
+  
+  .instructions {
+    position: absolute;
+    top: 2rem;
+    right: 2rem;
+    color: #0f0;
+    background-color: rgba(0, 0, 0, 0.5);
+    padding: 1rem;
+    border: 1px solid #0f0;
+    border-radius: 0.5rem;
+    font-family: 'Inter', monospace;
+    z-index: 10;
+  }
+  
+  .instructions h3 {
+    margin-top: 0;
+    margin-bottom: 0.5rem;
+  }
+  
+  .instructions p {
+    margin: 0.3rem 0;
+  }
+</style>
